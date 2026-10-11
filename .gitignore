@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+.turbo/
+# Keep committed SQL migrations; ignore only local drizzle-kit cache at repo root
+/drizzle/
+*.tsbuildinfo
+postgres-data/

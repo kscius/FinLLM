@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: finllm
+      POSTGRES_PASSWORD: finllm
+      POSTGRES_DB: finllm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finllm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql://finllm:finllm@postgres:5432/finllm
+      API_HOST: 0.0.0.0
+      API_PORT: 3001
+      SESSION_SECRET: dev-only-change-in-production-32chars-min
+      CORS_ORIGIN: http://localhost:5173
+      FINLLM_BOOK_CURRENCY: MXN
+      FINLLM_TIMEZONE: America/Mexico_City
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres-data:
