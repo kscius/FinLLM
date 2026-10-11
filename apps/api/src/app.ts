@@ -4,7 +4,7 @@ import cookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import bcrypt from "bcryptjs";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import {
   createDb,
   books,
@@ -26,6 +26,7 @@ import type { AppConfig } from "./config.js";
 import { generateToken, hashToken, sha256Payload } from "./crypto.js";
 import { seedSystemAccounts } from "./seed-accounts.js";
 import { createAndPostTransaction, computeNetWorthMxn, getAccountBalances } from "./services/ledger-service.js";
+import { getBudgetWithVariance } from "./services/budget-variance.js";
 import { parseCsvContent } from "./services/import-csv.js";
 
 export async function buildApp(config: AppConfig) {
@@ -405,6 +406,18 @@ export async function buildApp(config: AppConfig) {
     return { budgets: list };
   });
 
+  app.get("/api/v1/budgets/:id/variance", async (request, reply) => {
+    const ctx = await requireAuth(request, reply);
+    if (!ctx?.book) return;
+    const params = z.object({ id: z.string().uuid() }).parse(request.params);
+    const data = await getBudgetWithVariance(db, ctx.book.id, params.id);
+    if (!data) return reply.code(404).send({ error: "Budget not found" });
+    return {
+      budget: data.budget,
+      lines: data.lines,
+    };
+  });
+
   app.post("/api/v1/budgets", async (request, reply) => {
     const ctx = await requireAuth(request, reply);
     if (!ctx?.book) return;
@@ -544,6 +557,8 @@ export async function buildApp(config: AppConfig) {
       .object({
         accountId: z.string().uuid().optional(),
         reconcileState: z.enum(["UNCLEARED", "CLEARED", "RECONCILED"]).optional(),
+        fromDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        toDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
         limit: z.coerce.number().int().min(1).max(200).optional(),
       })
       .parse(request.query);
@@ -571,6 +586,8 @@ export async function buildApp(config: AppConfig) {
           eq(transactions.status, "POSTED"),
           query.accountId ? eq(splits.accountId, query.accountId) : sql`true`,
           query.reconcileState ? eq(splits.reconcileState, query.reconcileState) : sql`true`,
+          query.fromDate ? gte(transactions.txnDate, query.fromDate) : sql`true`,
+          query.toDate ? lte(transactions.txnDate, query.toDate) : sql`true`,
         ),
       )
       .limit(limit);

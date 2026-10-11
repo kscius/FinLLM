@@ -104,6 +104,8 @@ body {
   display: flex;
   gap: 0.25rem;
   flex: 1;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .nav-btn {
@@ -139,6 +141,8 @@ body {
 
 .app-main {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   width: min(960px, 100%);
   margin: 0 auto;
   padding: 1.25rem 1.25rem 2.5rem;
@@ -244,7 +248,8 @@ select:focus-visible {
 }
 
 .field input,
-.field select {
+.field select,
+.field textarea {
   display: block;
   width: 100%;
   padding: 0.55rem 0.65rem;

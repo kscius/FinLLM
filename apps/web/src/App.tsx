@@ -1,23 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./lib/api.js";
 import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
-import type { CurrencyCode } from "@finllm/money";
-
-type View = "overview" | "reconciliation";
+import type { AccountRow, AppView, BalanceRow } from "./lib/types.js";
+import { BudgetsView } from "./views/BudgetsView.js";
+import { ImportCsvView } from "./views/ImportCsvView.js";
+import { InvestmentsView } from "./views/InvestmentsView.js";
+import { MovementsView } from "./views/MovementsView.js";
 
 type Me = {
   user?: { email: string };
   book?: { id: string };
-};
-
-type BalanceRow = {
-  accountId: string;
-  code: string;
-  name: string;
-  type: string;
-  currencyCode: CurrencyCode;
-  balanceMinor: string;
-  includeInNetWorth: boolean;
 };
 
 type BalancesResponse = {
@@ -36,12 +28,15 @@ type UnclearedRow = {
 
 export function App() {
   const [me, setMe] = useState<Me | null>(null);
-  const [view, setView] = useState<View>("overview");
+  const [view, setView] = useState<AppView>("overview");
   const [balances, setBalances] = useState<BalancesResponse | null>(null);
   const [balancesLoading, setBalancesLoading] = useState(false);
   const [balancesError, setBalancesError] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<Array<{ id: string; name: string; code: string }>>([]);
+  const [allAccounts, setAllAccounts] = useState<AccountRow[]>([]);
   const [reconcileAccountId, setReconcileAccountId] = useState("");
+  const [reconcileFrom, setReconcileFrom] = useState("");
+  const [reconcileTo, setReconcileTo] = useState("");
   const [uncleared, setUncleared] = useState<UnclearedRow[]>([]);
   const [reconcileLoading, setReconcileLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +117,11 @@ export function App() {
     }
   }
 
+  const loadAllAccounts = useCallback(async () => {
+    const data = await api<{ accounts: AccountRow[] }>("/api/v1/accounts");
+    setAllAccounts(data.accounts);
+  }, []);
+
   async function loadAccounts() {
     const data = await api<{ accounts: Array<{ id: string; name: string; code: string; type: string }> }>(
       "/api/v1/accounts",
@@ -129,15 +129,21 @@ export function App() {
     const list = data.accounts.filter((a) => a.type === "ASSET" || a.type === "LIABILITY");
     setAccounts(list);
     if (!reconcileAccountId && list[0]) setReconcileAccountId(list[0].id);
+    setAllAccounts(data.accounts as AccountRow[]);
   }
 
   async function loadUncleared() {
     if (!reconcileAccountId) return;
     setReconcileLoading(true);
     try {
-      const data = await api<{ items: UnclearedRow[] }>(
-        `/api/v1/transactions?accountId=${reconcileAccountId}&reconcileState=UNCLEARED&limit=100`,
-      );
+      const params = new URLSearchParams({
+        accountId: reconcileAccountId,
+        reconcileState: "UNCLEARED",
+        limit: "100",
+      });
+      if (reconcileFrom) params.set("fromDate", reconcileFrom);
+      if (reconcileTo) params.set("toDate", reconcileTo);
+      const data = await api<{ items: UnclearedRow[] }>(`/api/v1/transactions?${params}`);
       setUncleared(data.items ?? []);
     } finally {
       setReconcileLoading(false);
@@ -154,10 +160,19 @@ export function App() {
   }
 
   useEffect(() => {
-    if (me?.user && view === "reconciliation" && accounts.length === 0) {
-      loadAccounts().catch(() => undefined);
+    if (!me?.user) return;
+    if (
+      (view === "reconciliation" && accounts.length === 0) ||
+      view === "movements" ||
+      view === "import" ||
+      view === "budgets"
+    ) {
+      loadAllAccounts().catch(() => undefined);
+      if (view === "reconciliation" && accounts.length === 0) {
+        loadAccounts().catch(() => undefined);
+      }
     }
-  }, [me?.user, view, accounts.length]);
+  }, [me?.user, view, accounts.length, loadAllAccounts]);
 
   if (!me?.user) {
     return (
@@ -249,6 +264,18 @@ export function App() {
           >
             Resumen
           </button>
+          <button type="button" className="nav-btn" aria-current={view === "movements" ? "page" : undefined} onClick={() => setView("movements")}>
+            Movimientos
+          </button>
+          <button type="button" className="nav-btn" aria-current={view === "import" ? "page" : undefined} onClick={() => setView("import")}>
+            Importar
+          </button>
+          <button type="button" className="nav-btn" aria-current={view === "budgets" ? "page" : undefined} onClick={() => setView("budgets")}>
+            Presupuestos
+          </button>
+          <button type="button" className="nav-btn" aria-current={view === "investments" ? "page" : undefined} onClick={() => setView("investments")}>
+            Inversiones
+          </button>
           <button
             type="button"
             className="nav-btn"
@@ -319,16 +346,47 @@ export function App() {
           </>
         )}
 
+        {view === "movements" && (
+          <MovementsView
+            accounts={allAccounts}
+            onPosted={() => {
+              loadBalances();
+              loadAllAccounts();
+            }}
+            onAccountsChanged={() => loadAllAccounts()}
+          />
+        )}
+        {view === "import" && (
+          <ImportCsvView
+            accounts={allAccounts}
+            onImported={() => {
+              loadBalances();
+              loadAllAccounts();
+            }}
+          />
+        )}
+        {view === "budgets" && <BudgetsView accounts={allAccounts} />}
+        {view === "investments" && <InvestmentsView balances={balances?.balances ?? null} />}
+
         {view === "reconciliation" && (
           <section className="card" aria-labelledby="reconcile-heading">
             <h2 id="reconcile-heading">Conciliación</h2>
-            <p className="muted">Marca movimientos no conciliados como conciliados cuando coincidan con tu estado de cuenta.</p>
+            <p className="muted">Filtra por periodo del estado de cuenta y marca partidas conciliadas.</p>
             <div className="toolbar">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => loadAccounts()}>
                 Cargar cuentas
               </button>
             </div>
             {accounts.length > 0 && (
+              <>
+              <div className="field">
+                <label htmlFor="reconcile-from">Desde (opcional)</label>
+                <input id="reconcile-from" type="date" value={reconcileFrom} onChange={(e) => setReconcileFrom(e.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor="reconcile-to">Hasta (opcional)</label>
+                <input id="reconcile-to" type="date" value={reconcileTo} onChange={(e) => setReconcileTo(e.target.value)} />
+              </div>
               <div className="field">
                 <label htmlFor="reconcile-account">Cuenta</label>
                 <select
@@ -343,6 +401,7 @@ export function App() {
                   ))}
                 </select>
               </div>
+              </>
             )}
             {reconcileAccountId && (
               <button

@@ -7,9 +7,10 @@
 | Transactions / splits / transfers | Implemented | Domain validation |
 | Balances / net worth | Implemented | Asset − liability |
 | CSV import preview + commit | Implemented | Duplicate via idempotency keys |
-| Budgets | Partial | Create/list; variance reports planned |
-| Reconciliation UI | Partial | Web uncleared list + mark reconciled; statements UI planned |
-| Investments | Planned | Phase 4 |
+| Budgets | Implemented | Web create/list + `GET /api/v1/budgets/:id/variance` |
+| Reconciliation UI | Implemented | Web uncleared list + date filter + mark reconciled |
+| Investments | Partial | Web vista de activos; analytics/lotes Phase 4+ |
+| Web — movements / CSV | Implemented | Gasto/ingreso, import preview+commit, crear cuentas |
 | MCP read tools | Implemented | list_accounts, get_balances, list_transactions |
 | MCP mutations | Implemented | preview_post_transaction + commit_post_transaction (confirm flow) |
 | Docker Compose | Implemented | postgres + api + web |
