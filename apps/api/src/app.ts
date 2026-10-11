@@ -33,6 +33,17 @@ export async function buildApp(config: AppConfig) {
   await app.register(cors, { origin: config.CORS_ORIGIN, credentials: true });
   await app.register(cookie, { secret: config.SESSION_SECRET });
 
+  const sessionCookieOptions = {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  function setSessionCookie(reply: { setCookie: (name: string, value: string, options: typeof sessionCookieOptions) => void }, token: string) {
+    reply.setCookie("finllm_session", token, sessionCookieOptions);
+  }
+
   app.decorate("db", db);
   app.decorate("config", config);
 
@@ -127,12 +138,7 @@ export async function buildApp(config: AppConfig) {
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
 
-    reply.setCookie("finllm_session", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
+    setSessionCookie(reply, token);
     return { userId: user.id, bookId: book?.id };
   });
 
@@ -148,12 +154,7 @@ export async function buildApp(config: AppConfig) {
       tokenHash: hashToken(token),
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
-    reply.setCookie("finllm_session", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
+    setSessionCookie(reply, token);
     const book = await db.query.books.findFirst({ where: eq(books.userId, user.id) });
     return { userId: user.id, bookId: book?.id };
   });
@@ -163,8 +164,13 @@ export async function buildApp(config: AppConfig) {
     if (raw) {
       await db.delete(sessions).where(eq(sessions.tokenHash, hashToken(raw)));
     }
-    reply.clearCookie("finllm_session", { path: "/" });
+    reply.clearCookie("finllm_session", sessionCookieOptions);
     return { ok: true };
+  });
+
+  app.get("/api/v1/setup/status", async () => {
+    const existing = await db.query.users.findFirst();
+    return { initialized: Boolean(existing) };
   });
 
   app.get("/api/v1/me", async (request, reply) => {
@@ -201,7 +207,7 @@ export async function buildApp(config: AppConfig) {
       tokenHash: hashToken(token),
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
-    reply.setCookie("finllm_session", token, { httpOnly: true, sameSite: "lax", path: "/" });
+    setSessionCookie(reply, token);
     return { userId: user.id, bookId: book?.id };
   });
 

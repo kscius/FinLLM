@@ -2,7 +2,7 @@
 
 | Area | Status | Notes |
 | ---- | ------ | ----- |
-| Auth / single-user setup | Implemented | `/api/v1/setup/initialize` |
+| Auth / single-user setup | Implemented | `/api/v1/setup/initialize`, `/api/v1/setup/status`; web hides init when already set up |
 | Accounts (MXN/USD) | Implemented | REST |
 | Transactions / splits / transfers | Implemented | Domain validation |
 | Balances / net worth | Implemented | Asset − liability |

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+/** Empty = same origin (Traefik: web + /api on one host). Dev: set VITE_API_URL in .env */
+const API = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 async function api(path: string, init?: RequestInit) {
   const res = await fetch(`${API}${path}`, {
@@ -22,8 +23,12 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [instanceInitialized, setInstanceInitialized] = useState<boolean | null>(null);
 
   useEffect(() => {
+    api("/api/v1/setup/status")
+      .then((data: { initialized?: boolean }) => setInstanceInitialized(Boolean(data.initialized)))
+      .catch(() => setInstanceInitialized(null));
     api("/api/v1/me")
       .then(setMe)
       .catch(() => setMe(null));
@@ -38,7 +43,13 @@ export function App() {
       });
       setMe(await api("/api/v1/me"));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Setup failed");
+      const message = e instanceof Error ? e.message : "Setup failed";
+      if (message === "Instance already initialized") {
+        setInstanceInitialized(true);
+        setError("This instance is already set up. Use Sign in with your owner email and password.");
+      } else {
+        setError(message);
+      }
     }
   }
 
@@ -96,14 +107,27 @@ export function App() {
     return (
       <main>
         <h1>FinLLM</h1>
-        <p className="card">Self-hosted personal finance. Initialize your instance or sign in.</p>
+        <p className="card">
+          {instanceInitialized
+            ? "Instance is ready. Sign in with the email and password you used during setup."
+            : "Self-hosted personal finance. Create the first owner account to initialize this instance."}
+        </p>
         <div className="card">
           <label>Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
-          <label>Password (min 12)</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" />
-          <button type="button" onClick={initialize}>Initialize instance</button>
-          <button type="button" onClick={login} style={{ marginLeft: 8 }}>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" />
+          <label>{instanceInitialized ? "Password" : "Password (min 12)"}</label>
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            autoComplete={instanceInitialized ? "current-password" : "new-password"}
+          />
+          {!instanceInitialized && (
+            <button type="button" onClick={initialize} style={{ marginRight: 8 }}>
+              Initialize instance
+            </button>
+          )}
+          <button type="button" onClick={login}>
             Sign in
           </button>
           {error && <p role="alert">{error}</p>}
