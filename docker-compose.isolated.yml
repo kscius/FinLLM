@@ -1,0 +1,86 @@
+# Self-contained, isolated FinLLM stack (no port clashes with other local services).
+# Usage:
+#   docker compose -f docker-compose.isolated.yml up --build -d
+#   docker compose -f docker-compose.isolated.yml --profile tools run --rm migrate
+#   docker compose -f docker-compose.isolated.yml down
+#
+# Web UI:  http://127.0.0.1:15173
+# API:     http://127.0.0.1:13001/health
+# Postgres (optional host access): 127.0.0.1:15432
+name: finllm
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: finllm
+      POSTGRES_PASSWORD: finllm
+      POSTGRES_DB: finllm
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finllm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finllm_internal
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql://finllm:finllm@postgres:5432/finllm
+      API_HOST: 0.0.0.0
+      API_PORT: 3001
+      SESSION_SECRET: dev-only-change-in-production-32chars-min
+      CORS_ORIGIN: http://127.0.0.1:15173
+      FINLLM_BOOK_CURRENCY: MXN
+      FINLLM_TIMEZONE: America/Mexico_City
+    ports:
+      - "127.0.0.1:13001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finllm_internal
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+      args:
+        VITE_API_URL: http://127.0.0.1:13001
+    ports:
+      - "127.0.0.1:15173:80"
+    depends_on:
+      - api
+    networks:
+      - finllm_internal
+
+  migrate:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql://finllm:finllm@postgres:5432/finllm
+    command: ["pnpm", "db:migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finllm_internal
+    profiles:
+      - tools
+
+networks:
+  finllm_internal:
+    name: finllm_internal
+    driver: bridge
+
+volumes:
+  postgres-data:
+    name: finllm_postgres_data
