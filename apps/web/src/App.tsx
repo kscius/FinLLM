@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "./components/ThemeToggle.js";
 import { api } from "./lib/api.js";
 import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
+import { setLocationHashForView, VIEW_META, viewFromLocationHash } from "./lib/navigation.js";
 import type { AccountRow, AppView, BalanceRow } from "./lib/types.js";
 import { BudgetsView } from "./views/BudgetsView.js";
 import { ImportCsvView } from "./views/ImportCsvView.js";
@@ -43,6 +45,17 @@ export function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [instanceInitialized, setInstanceInitialized] = useState<boolean | null>(null);
+  const [authBooting, setAuthBooting] = useState(true);
+  const [pageStatus, setPageStatus] = useState("");
+  const [reconcileFeedback, setReconcileFeedback] = useState<{ text: string; kind: "success" | "error" } | null>(null);
+  const [reconcileRowBusy, setReconcileRowBusy] = useState<string | null>(null);
+  const viewTitleRef = useRef<HTMLHeadingElement>(null);
+
+  const navigateToView = useCallback((next: AppView) => {
+    setView(next);
+    setLocationHashForView(next);
+    setPageStatus(`Vista actual: ${VIEW_META[next].documentTitle}`);
+  }, []);
 
   const refreshMe = useCallback(async () => {
     try {
@@ -65,11 +78,39 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    api<{ initialized?: boolean }>("/api/v1/setup/status")
-      .then((data) => setInstanceInitialized(Boolean(data.initialized)))
-      .catch(() => setInstanceInitialized(null));
-    refreshMe();
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api<{ initialized?: boolean }>("/api/v1/setup/status");
+        if (!cancelled) setInstanceInitialized(Boolean(data.initialized));
+      } catch {
+        if (!cancelled) setInstanceInitialized(null);
+      }
+      await refreshMe();
+      if (!cancelled) setAuthBooting(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [refreshMe]);
+
+  useEffect(() => {
+    const fromHash = viewFromLocationHash();
+    if (fromHash) setView(fromHash);
+    else if (!window.location.hash) setLocationHashForView("overview");
+
+    const onHash = () => {
+      const v = viewFromLocationHash();
+      if (v) setView(v);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    document.title = `FinLLM — ${VIEW_META[view].documentTitle}`;
+    viewTitleRef.current?.focus();
+  }, [view]);
 
   useEffect(() => {
     if (me?.user) loadBalances();
@@ -151,12 +192,24 @@ export function App() {
   }
 
   async function markReconciled(splitId: string) {
-    await api(`/api/v1/splits/${splitId}/reconcile`, {
-      method: "PATCH",
-      body: JSON.stringify({ state: "RECONCILED" }),
-    });
-    await loadUncleared();
-    await loadBalances();
+    setReconcileFeedback(null);
+    setReconcileRowBusy(splitId);
+    try {
+      await api(`/api/v1/splits/${splitId}/reconcile`, {
+        method: "PATCH",
+        body: JSON.stringify({ state: "RECONCILED" }),
+      });
+      setReconcileFeedback({ text: "Partida marcada como conciliada.", kind: "success" });
+      await loadUncleared();
+      await loadBalances();
+    } catch (e) {
+      setReconcileFeedback({
+        text: e instanceof Error ? e.message : "No se pudo conciliar la partida",
+        kind: "error",
+      });
+    } finally {
+      setReconcileRowBusy(null);
+    }
   }
 
   useEffect(() => {
@@ -175,6 +228,15 @@ export function App() {
   }, [me?.user, view, accounts.length, loadAllAccounts]);
 
   if (!me?.user) {
+    if (authBooting) {
+      return (
+        <div className="auth-wrap">
+          <main className="card auth-card auth-loading" aria-busy="true">
+            <p className="muted">Comprobando instancia…</p>
+          </main>
+        </div>
+      );
+    }
     return (
       <div className="auth-wrap">
         <a className="skip-link" href="#auth-main">Ir al contenido</a>
@@ -254,39 +316,23 @@ export function App() {
     <div className="app-shell">
       <a className="skip-link" href="#app-main">Ir al contenido</a>
       <header className="app-header">
-        <p className="brand">FinLLM</p>
+        <h1 className="brand">FinLLM</h1>
         <nav className="app-nav" aria-label="Principal">
-          <button
-            type="button"
-            className="nav-btn"
-            aria-current={view === "overview" ? "page" : undefined}
-            onClick={() => setView("overview")}
-          >
-            Resumen
-          </button>
-          <button type="button" className="nav-btn" aria-current={view === "movements" ? "page" : undefined} onClick={() => setView("movements")}>
-            Movimientos
-          </button>
-          <button type="button" className="nav-btn" aria-current={view === "import" ? "page" : undefined} onClick={() => setView("import")}>
-            Importar
-          </button>
-          <button type="button" className="nav-btn" aria-current={view === "budgets" ? "page" : undefined} onClick={() => setView("budgets")}>
-            Presupuestos
-          </button>
-          <button type="button" className="nav-btn" aria-current={view === "investments" ? "page" : undefined} onClick={() => setView("investments")}>
-            Inversiones
-          </button>
-          <button
-            type="button"
-            className="nav-btn"
-            aria-current={view === "reconciliation" ? "page" : undefined}
-            onClick={() => setView("reconciliation")}
-          >
-            Conciliación
-          </button>
+          {(Object.keys(VIEW_META) as AppView[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              className="nav-btn"
+              aria-current={view === key ? "page" : undefined}
+              onClick={() => navigateToView(key)}
+            >
+              {VIEW_META[key].navLabel}
+            </button>
+          ))}
         </nav>
         <div className="header-meta">
-          <span>{me.user.email}</span>
+          <ThemeToggle />
+          <span className="header-email" title={me.user.email}>{me.user.email}</span>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => logout()}>
             Salir
           </button>
@@ -294,10 +340,14 @@ export function App() {
       </header>
 
       <main id="app-main" className="app-main">
+        <p className="sr-only live-status" aria-live="polite" aria-atomic="true">{pageStatus}</p>
+        <h2 ref={viewTitleRef} tabIndex={-1} className="view-title" id="view-title">
+          {VIEW_META[view].documentTitle}
+        </h2>
         {view === "overview" && (
           <>
             <section className="card hero-patrimonio" aria-labelledby="patrimonio-heading">
-              <p className="label" id="patrimonio-heading">Patrimonio neto (MXN)</p>
+              <h2 className="label" id="patrimonio-heading">Patrimonio neto (MXN)</h2>
               <p className="amount" aria-live="polite">
                 {balancesLoading ? "Cargando…" : netWorthDisplay}
               </p>
@@ -366,12 +416,22 @@ export function App() {
           />
         )}
         {view === "budgets" && <BudgetsView accounts={allAccounts} />}
-        {view === "investments" && <InvestmentsView balances={balances?.balances ?? null} />}
+        {view === "investments" && (
+          <InvestmentsView balances={balances?.balances ?? null} balancesLoading={balancesLoading} />
+        )}
 
         {view === "reconciliation" && (
-          <section className="card" aria-labelledby="reconcile-heading">
-            <h2 id="reconcile-heading">Conciliación</h2>
+            <section className="card" aria-labelledby="reconcile-heading">
+            <h2 id="reconcile-heading" className="sr-only">Conciliación</h2>
             <p className="muted">Filtra por periodo del estado de cuenta y marca partidas conciliadas.</p>
+            {reconcileFeedback && (
+              <p
+                className={`status-banner ${reconcileFeedback.kind === "success" ? "status-banner--success" : "status-banner--error"}`}
+                role="status"
+              >
+                {reconcileFeedback.text}
+              </p>
+            )}
             <div className="toolbar">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => loadAccounts()}>
                 Cargar cuentas
@@ -379,13 +439,15 @@ export function App() {
             </div>
             {accounts.length > 0 && (
               <>
-              <div className="field">
-                <label htmlFor="reconcile-from">Desde (opcional)</label>
-                <input id="reconcile-from" type="date" value={reconcileFrom} onChange={(e) => setReconcileFrom(e.target.value)} />
-              </div>
-              <div className="field">
-                <label htmlFor="reconcile-to">Hasta (opcional)</label>
-                <input id="reconcile-to" type="date" value={reconcileTo} onChange={(e) => setReconcileTo(e.target.value)} />
+              <div className="form-grid form-grid--2">
+                <div className="field">
+                  <label htmlFor="reconcile-from">Desde (opcional)</label>
+                  <input id="reconcile-from" type="date" value={reconcileFrom} onChange={(e) => setReconcileFrom(e.target.value)} />
+                </div>
+                <div className="field">
+                  <label htmlFor="reconcile-to">Hasta (opcional)</label>
+                  <input id="reconcile-to" type="date" value={reconcileTo} onChange={(e) => setReconcileTo(e.target.value)} />
+                </div>
               </div>
               <div className="field">
                 <label htmlFor="reconcile-account">Cuenta</label>
@@ -431,8 +493,15 @@ export function App() {
                         (D {formatMinorDisplay(row.debitMinor, "MXN")} / C {formatMinorDisplay(row.creditMinor, "MXN")})
                       </span>
                     </span>
-                    <button type="button" className="btn btn-sm" onClick={() => markReconciled(row.splitId)}>
-                      Marcar conciliado
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      disabled={reconcileRowBusy === row.splitId}
+                      aria-busy={reconcileRowBusy === row.splitId}
+                      aria-label={`Marcar conciliado: ${row.txnDate}, ${row.description ?? "Sin descripción"}`}
+                      onClick={() => markReconciled(row.splitId)}
+                    >
+                      {reconcileRowBusy === row.splitId ? "Guardando…" : "Marcar conciliado"}
                     </button>
                   </li>
                 ))}

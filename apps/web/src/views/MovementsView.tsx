@@ -18,6 +18,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
   const [categoryId, setCategoryId] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [newCode, setNewCode] = useState("");
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState<"ASSET" | "EXPENSE" | "INCOME">("ASSET");
@@ -25,12 +26,15 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
   const assets = accounts.filter((a) => a.type === "ASSET" && !a.isSystem);
   const expenses = accounts.filter((a) => a.type === "EXPENSE" && !a.isSystem);
   const incomes = accounts.filter((a) => a.type === "INCOME" && !a.isSystem);
+  const categories = kind === "expense" ? expenses : incomes;
+  const canPost = assets.length > 0 && categories.length > 0;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     const payFrom = assetId || assets[0]?.id;
-    const cat = categoryId || (kind === "expense" ? expenses[0]?.id : incomes[0]?.id);
+    const cat = categoryId || categories[0]?.id;
     if (!payFrom || !cat) {
       setError("Crea al menos una cuenta de activo y una de gasto o ingreso.");
       return;
@@ -55,6 +59,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
       });
       setAmount("");
       setDescription("");
+      setSuccess("Movimiento registrado correctamente.");
       onPosted();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al registrar");
@@ -66,6 +71,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
   async function createAccount(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     try {
       await api("/api/v1/accounts", {
         method: "POST",
@@ -79,21 +85,28 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
       });
       setNewCode("");
       setNewName("");
+      setSuccess("Cuenta creada.");
       onAccountsChanged();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear cuenta");
     }
   }
 
+  const errorId = "movements-error";
+
   return (
-    <section className="card" aria-labelledby="movements-heading">
-      <h2 id="movements-heading">Movimientos</h2>
+    <section className="card" aria-labelledby="view-title">
       <p className="muted">Registra un gasto o ingreso en MXN (doble partida automática).</p>
-      <form onSubmit={submit}>
-        <div className="toolbar">
+      {!canPost && (
+        <div className="empty-state" role="status">
+          Crea al menos una cuenta de activo y una de {kind === "expense" ? "gasto" : "ingreso"} en «Nueva cuenta».
+        </div>
+      )}
+      <form onSubmit={submit} aria-busy={busy}>
+        <div role="group" aria-label="Tipo de movimiento" className="segmented">
           <button
             type="button"
-            className={`nav-btn ${kind === "expense" ? "" : "btn-ghost"}`}
+            className="segmented-btn"
             aria-pressed={kind === "expense"}
             onClick={() => setKind("expense")}
           >
@@ -101,7 +114,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           </button>
           <button
             type="button"
-            className={`nav-btn ${kind === "income" ? "" : "btn-ghost"}`}
+            className="segmented-btn"
             aria-pressed={kind === "income"}
             onClick={() => setKind("income")}
           >
@@ -114,7 +127,15 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
         </div>
         <div className="field">
           <label htmlFor="txn-amount">Monto (MXN)</label>
-          <input id="txn-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+          <input
+            id="txn-amount"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+          />
         </div>
         <div className="field">
           <label htmlFor="txn-desc">Descripción</label>
@@ -122,26 +143,43 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
         </div>
         <div className="field">
           <label htmlFor="txn-asset">Cuenta de pago / depósito</label>
-          <select id="txn-asset" value={assetId || assets[0]?.id || ""} onChange={(e) => setAssetId(e.target.value)}>
-            {assets.map((a) => (
-              <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
-            ))}
+          <select
+            id="txn-asset"
+            value={assetId || assets[0]?.id || ""}
+            onChange={(e) => setAssetId(e.target.value)}
+            disabled={assets.length === 0}
+          >
+            {assets.length === 0 ? (
+              <option value="">Sin cuentas de activo</option>
+            ) : (
+              assets.map((a) => (
+                <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
+              ))
+            )}
           </select>
         </div>
         <div className="field">
           <label htmlFor="txn-cat">{kind === "expense" ? "Categoría de gasto" : "Categoría de ingreso"}</label>
           <select
             id="txn-cat"
-            value={categoryId || (kind === "expense" ? expenses[0]?.id : incomes[0]?.id) || ""}
+            value={categoryId || categories[0]?.id || ""}
             onChange={(e) => setCategoryId(e.target.value)}
+            disabled={categories.length === 0}
           >
-            {(kind === "expense" ? expenses : incomes).map((a) => (
-              <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
-            ))}
+            {categories.length === 0 ? (
+              <option value="">Sin categorías</option>
+            ) : (
+              categories.map((a) => (
+                <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
+              ))
+            )}
           </select>
         </div>
-        <button type="submit" className="btn" disabled={busy}>{busy ? "Guardando…" : "Registrar"}</button>
-        {error && <p className="alert" role="alert">{error}</p>}
+        <button type="submit" className="btn" disabled={busy || !canPost} aria-busy={busy}>
+          {busy ? "Guardando…" : "Registrar"}
+        </button>
+        {success && <p className="status-banner status-banner--success" role="status">{success}</p>}
+        {error && <p className="alert" id={errorId} role="alert">{error}</p>}
       </form>
 
       <details className="card" style={{ marginTop: "1.25rem", padding: "0.75rem" }}>
