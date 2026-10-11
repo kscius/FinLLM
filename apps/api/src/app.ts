@@ -1,6 +1,8 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
+import helmet from "@fastify/helmet";
+import rateLimit from "@fastify/rate-limit";
 import bcrypt from "bcryptjs";
 import { and, eq, sql } from "drizzle-orm";
 import {
@@ -28,16 +30,48 @@ import { parseCsvContent } from "./services/import-csv.js";
 
 export async function buildApp(config: AppConfig) {
   const db = createDb(config.DATABASE_URL);
-  const app = Fastify({ logger: true });
+  const isProd = config.NODE_ENV === "production";
+  const app = Fastify({ logger: true, trustProxy: config.TRUST_PROXY });
 
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: isProd ? "same-origin" : "cross-origin" },
+    hsts: isProd ? { maxAge: 31_536_000, includeSubDomains: true } : false,
+  });
+  await app.register(rateLimit, {
+    global: true,
+    max: 200,
+    timeWindow: "1 minute",
+  });
   await app.register(cors, { origin: config.CORS_ORIGIN, credentials: true });
   await app.register(cookie, { secret: config.SESSION_SECRET });
 
+  app.addHook("onSend", async (request, reply, payload) => {
+    if (request.url.startsWith("/api/")) {
+      reply.header("Cache-Control", "no-store");
+    }
+    return payload;
+  });
+
   const sessionCookieOptions = {
     httpOnly: true,
-    sameSite: "lax" as const,
+    sameSite: (isProd ? "strict" : "lax") as "strict" | "lax",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: isProd,
+    maxAge: isProd ? 30 * 24 * 60 * 60 : undefined,
+  };
+
+  const authRateLimit = {
+    rateLimit: {
+      max: 10,
+      timeWindow: "15 minutes",
+    },
+  };
+  const setupRateLimit = {
+    rateLimit: {
+      max: 5,
+      timeWindow: "1 hour",
+    },
   };
 
   function setSessionCookie(reply: { setCookie: (name: string, value: string, options: typeof sessionCookieOptions) => void }, token: string) {
@@ -103,7 +137,7 @@ export async function buildApp(config: AppConfig) {
     return { status: "ready" };
   });
 
-  app.post("/api/v1/auth/register", async (request, reply) => {
+  app.post("/api/v1/auth/register", { config: setupRateLimit }, async (request, reply) => {
     if (!config.ALLOW_REGISTRATION) {
       return reply.code(403).send({ error: "Registration disabled" });
     }
@@ -142,7 +176,7 @@ export async function buildApp(config: AppConfig) {
     return { userId: user.id, bookId: book?.id };
   });
 
-  app.post("/api/v1/auth/login", async (request, reply) => {
+  app.post("/api/v1/auth/login", { config: authRateLimit }, async (request, reply) => {
     const body = z.object({ email: z.string().email(), password: z.string() }).parse(request.body);
     const user = await db.query.users.findFirst({ where: eq(users.email, body.email) });
     if (!user || !(await bcrypt.compare(body.password, user.passwordHash))) {
@@ -182,7 +216,7 @@ export async function buildApp(config: AppConfig) {
     };
   });
 
-  app.post("/api/v1/setup/initialize", async (request, reply) => {
+  app.post("/api/v1/setup/initialize", { config: setupRateLimit }, async (request, reply) => {
     const existing = await db.query.users.findFirst();
     if (existing) return reply.code(409).send({ error: "Instance already initialized" });
     const body = z

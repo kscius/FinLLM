@@ -6,6 +6,11 @@ const envSchema = z.object({
   API_PORT: z.coerce.number().default(3001),
   SESSION_SECRET: z.string().min(32),
   CORS_ORIGIN: z.string().default("http://localhost:5173"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  TRUST_PROXY: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
   ALLOW_REGISTRATION: z
     .string()
     .optional()
@@ -21,5 +26,9 @@ export function loadConfig(): AppConfig {
   if (!parsed.success) {
     throw new Error(`Invalid environment: ${parsed.error.message}`);
   }
-  return parsed.data;
+  const data = parsed.data;
+  return {
+    ...data,
+    TRUST_PROXY: data.TRUST_PROXY || data.NODE_ENV === "production",
+  };
 }
