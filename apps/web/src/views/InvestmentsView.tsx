@@ -1,3 +1,4 @@
+import { EmptyState } from "../components/EmptyState.js";
 import { formatMinorDisplay } from "../lib/format.js";
 import type { BalanceRow } from "../lib/types.js";
 
@@ -18,9 +19,9 @@ export function InvestmentsView({ balances, balancesLoading }: Props) {
       </p>
       {balancesLoading && <p className="muted" role="status">Cargando saldos…</p>}
       {!balancesLoading && assets.length === 0 ? (
-        <div className="empty-state" role="status">
+        <EmptyState illustration="chart" title="Sin posiciones">
           No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos.
-        </div>
+        </EmptyState>
       ) : (
         !balancesLoading &&
         assets.length > 0 && (

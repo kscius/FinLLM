@@ -9,7 +9,7 @@
 | CSV import preview + commit | Implemented | Duplicate via idempotency keys |
 | Budgets | Implemented | Web create/list + `GET /api/v1/budgets/:id/variance` |
 | Reconciliation UI | Implemented | Web uncleared list + date filter + mark reconciled |
-| Web UX / design system | Implemented | Hash routes, theme toggle, Spanish a11y patterns, responsive nav, empty/loading/success states |
+| Web UX / design system | Implemented | Marca SVG + favicon, iconos de navegación, estados vacíos ilustrados, barra activo/pasivo en resumen, hash routes, tema claro/oscuro, a11y ES |
 | Investments | Partial | Web vista de activos; analytics/lotes Phase 4+ |
 | Web — movements / CSV | Implemented | Gasto/ingreso, import preview+commit, crear cuentas |
 | MCP read tools | Implemented | list_accounts, get_balances, list_transactions |

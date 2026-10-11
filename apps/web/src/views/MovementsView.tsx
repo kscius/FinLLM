@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EmptyState } from "../components/EmptyState.js";
 import { parseToMinor } from "@finllm/money";
 import { api } from "../lib/api.js";
 import type { AccountRow } from "../lib/types.js";
@@ -98,9 +99,9 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
     <section className="card" aria-labelledby="view-title">
       <p className="muted">Registra un gasto o ingreso en MXN (doble partida automática).</p>
       {!canPost && (
-        <div className="empty-state" role="status">
+        <EmptyState illustration="wallet" title="Faltan cuentas">
           Crea al menos una cuenta de activo y una de {kind === "expense" ? "gasto" : "ingreso"} en «Nueva cuenta».
-        </div>
+        </EmptyState>
       )}
       <form onSubmit={submit} aria-busy={busy}>
         <div role="group" aria-label="Tipo de movimiento" className="segmented">

@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BalanceBreakdown } from "./components/BalanceBreakdown.js";
+import { BrandLockup } from "./components/BrandLockup.js";
+import { EmptyState } from "./components/EmptyState.js";
+import { NavIcon } from "./components/NavIcon.js";
 import { ThemeToggle } from "./components/ThemeToggle.js";
 import { api } from "./lib/api.js";
 import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
@@ -241,7 +245,7 @@ export function App() {
       <div className="auth-wrap">
         <a className="skip-link" href="#auth-main">Ir al contenido</a>
         <main id="auth-main" className="card auth-card">
-          <h1>FinLLM</h1>
+          <BrandLockup as="h1" subtitle="Libro contable personal" />
           <p className="muted">
             {instanceInitialized
               ? "Tu libro contable personal. Inicia sesión con el correo y la contraseña de la configuración inicial."
@@ -316,7 +320,7 @@ export function App() {
     <div className="app-shell">
       <a className="skip-link" href="#app-main">Ir al contenido</a>
       <header className="app-header">
-        <h1 className="brand">FinLLM</h1>
+        <BrandLockup as="h1" compact />
         <nav className="app-nav" aria-label="Principal">
           {(Object.keys(VIEW_META) as AppView[]).map((key) => (
             <button
@@ -326,7 +330,8 @@ export function App() {
               aria-current={view === key ? "page" : undefined}
               onClick={() => navigateToView(key)}
             >
-              {VIEW_META[key].navLabel}
+              <NavIcon view={key} />
+              <span>{VIEW_META[key].navLabel}</span>
             </button>
           ))}
         </nav>
@@ -354,7 +359,21 @@ export function App() {
               {balancesError && (
                 <p className="alert" role="alert">{balancesError}</p>
               )}
+              {balances && balances.balances.length > 0 && (
+                <BalanceBreakdown rows={balances.balances} />
+              )}
             </section>
+            <div className="quick-actions" role="navigation" aria-label="Acciones rápidas">
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("movements")}>
+                Registrar movimiento
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("import")}>
+                Importar CSV
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("reconciliation")}>
+                Conciliar
+              </button>
+            </div>
             <section className="card" aria-labelledby="cuentas-heading">
               <div className="toolbar">
                 <h2 id="cuentas-heading" style={{ margin: 0, flex: 1 }}>Cuentas</h2>
@@ -363,7 +382,9 @@ export function App() {
                 </button>
               </div>
               {!balancesLoading && balances && balances.balances.length === 0 && (
-                <p className="muted">No hay movimientos publicados todavía.</p>
+                <EmptyState title="Sin movimientos aún" illustration="ledger">
+                  Registra un gasto o ingreso en Movimientos, o importa un CSV para ver saldos aquí.
+                </EmptyState>
               )}
               {balances && balances.balances.length > 0 && (
                 <div className="table-wrap">
@@ -421,8 +442,7 @@ export function App() {
         )}
 
         {view === "reconciliation" && (
-            <section className="card" aria-labelledby="reconcile-heading">
-            <h2 id="reconcile-heading" className="sr-only">Conciliación</h2>
+            <section className="card" aria-labelledby="view-title">
             <p className="muted">Filtra por periodo del estado de cuenta y marca partidas conciliadas.</p>
             {reconcileFeedback && (
               <p
@@ -476,9 +496,9 @@ export function App() {
               </button>
             )}
             {uncleared.length === 0 && reconcileAccountId && !reconcileLoading && (
-              <p className="muted" style={{ marginTop: "1rem" }}>
-                No hay partidas sin conciliar cargadas. Pulsa el botón anterior para buscarlas.
-              </p>
+              <EmptyState illustration="reconcile" title="Sin partidas cargadas">
+                Pulsa «Ver movimientos sin conciliar» para buscar en el periodo seleccionado.
+              </EmptyState>
             )}
             {uncleared.length > 0 && (
               <ul className="split-list" style={{ marginTop: "1rem" }}>

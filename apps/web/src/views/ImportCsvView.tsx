@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { EmptyState } from "../components/EmptyState.js";
 import { api } from "../lib/api.js";
 import type { AccountRow } from "../lib/types.js";
 
@@ -160,9 +161,9 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </table>
           </div>
           {!canCommit && (
-            <div className="empty-state" role="status">
+            <EmptyState illustration="upload" title="Cuentas incompletas">
               Crea cuentas de activo, gasto e ingreso antes de confirmar la importación.
-            </div>
+            </EmptyState>
           )}
           <div className="field">
             <label htmlFor="imp-asset">Cuenta activo</label>

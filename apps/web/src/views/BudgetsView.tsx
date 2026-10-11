@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { EmptyState } from "../components/EmptyState.js";
 import { parseToMinor } from "@finllm/money";
 import { api } from "../lib/api.js";
 import { formatMinorDisplay } from "../lib/format.js";
@@ -155,7 +156,9 @@ export function BudgetsView({ accounts }: Props) {
 
       {listLoading && <p className="muted" role="status">Cargando presupuestos…</p>}
       {!listLoading && list.length === 0 && (
-        <div className="empty-state" role="status">Aún no hay presupuestos. Crea el primero arriba.</div>
+        <EmptyState illustration="chart" title="Sin presupuestos">
+          Define un periodo y montos por cuenta de gasto para hacer seguimiento.
+        </EmptyState>
       )}
 
       {list.length > 0 && (
