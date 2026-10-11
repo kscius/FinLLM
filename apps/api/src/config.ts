@@ -40,6 +40,11 @@ export function loadConfig(): AppConfig {
   }
   const data = parsed.data;
   const isProd = data.NODE_ENV === "production";
+  if (isProd && !data.SETUP_BOOTSTRAP_SECRET) {
+    throw new Error(
+      "SETUP_BOOTSTRAP_SECRET (min 32 chars) is required when NODE_ENV=production — protects first-time /api/v1/setup/initialize",
+    );
+  }
   return {
     ...data,
     TRUST_PROXY: data.TRUST_PROXY || isProd,

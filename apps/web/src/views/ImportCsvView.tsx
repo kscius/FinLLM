@@ -41,9 +41,9 @@ export function ImportCsvView({ accounts, onImported }: Props) {
       setImportJobId(data.importJobId);
       setRows(data.rows ?? []);
       const n = data.rows?.length ?? 0;
-      setStatus(n === 0 ? "Vista previa sin filas." : `${n} filas listas para importar.`);
+      setStatus(n === 0 ? t("import.previewEmpty") : t("import.previewReady", { count: n }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Vista previa fallida");
+      setError(err instanceof Error ? err.message : t("import.previewFailed"));
     } finally {
       setBusy(false);
     }
@@ -55,7 +55,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
     const e = expenseId || expenses[0]?.id;
     const i = incomeId || incomes[0]?.id;
     if (!a || !e || !i) {
-      setError("Selecciona cuentas por defecto para activo, gasto e ingreso.");
+      setError(t("import.selectDefaultAccounts"));
       return;
     }
     setBusy(true);
@@ -73,10 +73,10 @@ export function ImportCsvView({ accounts, onImported }: Props) {
       setCsv("");
       setRows([]);
       setImportJobId(null);
-      setStatus("Importación completada.");
+      setStatus(t("import.importComplete"));
       onImported();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Importación fallida");
+      setError(err instanceof Error ? err.message : t("import.importFailed"));
     } finally {
       setBusy(false);
     }
@@ -88,7 +88,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
     reader.onload = () => {
       const text = typeof reader.result === "string" ? reader.result : "";
       setCsv(text);
-      setStatus(`Archivo ${file.name} cargado. Revisa y pulsa Vista previa.`);
+      setStatus(t("import.fileLoaded", { name: file.name }));
     };
     reader.readAsText(file);
   }
@@ -98,11 +98,11 @@ export function ImportCsvView({ accounts, onImported }: Props) {
 
   return (
     <section className="card" aria-labelledby="view-title">
-      <p className="muted">Formato: date,amount,description,external_ref (encabezado opcional).</p>
+      <p className="muted">{t("import.formatHint")}</p>
       <p className="sr-only" aria-live="polite">{status}</p>
       <div className="file-input-wrap">
         <label className="btn btn-ghost btn-sm" htmlFor="csv-file">
-          Elegir archivo CSV
+          {t("import.chooseFile")}
         </label>
         <input
           ref={fileRef}
@@ -112,10 +112,10 @@ export function ImportCsvView({ accounts, onImported }: Props) {
           className="sr-only"
           onChange={(e) => onFilePicked(e.target.files?.[0])}
         />
-        <span className="field-hint">O pega el contenido abajo.</span>
+        <span className="field-hint">{t("import.pasteHint")}</span>
       </div>
       <div className="field">
-        <label htmlFor="csv-content">Contenido CSV</label>
+        <label htmlFor="csv-content">{t("import.csvContent")}</label>
         <textarea
           id="csv-content"
           rows={8}
@@ -131,24 +131,24 @@ export function ImportCsvView({ accounts, onImported }: Props) {
         disabled={busy || !csv.trim()}
         aria-busy={busy}
       >
-        {busy ? "Procesando…" : "Vista previa"}
+        {busy ? t("common.processing") : t("import.preview")}
       </button>
       {previewCount > 0 && (
         <>
           <p className="muted" style={{ marginTop: "1rem" }} aria-live="polite">
-            {previewCount} filas listas para importar.
-            {previewCount > 20 && " Mostrando las primeras 20 en la tabla."}
+            {t("import.rowsReady", { count: previewCount })}
+            {previewCount > 20 && t("import.rowsReadyTruncated")}
           </p>
           <div className="table-wrap">
             <table className="data-table">
               <caption className="sr-only">
-                Vista previa de importación ({shown.length} de {previewCount} filas)
+                {t("import.previewCaption", { shown: shown.length, total: previewCount })}
               </caption>
               <thead>
                 <tr>
-                  <th scope="col">Fecha</th>
-                  <th scope="col">Monto</th>
-                  <th scope="col">Descripción</th>
+                  <th scope="col">{t("common.date")}</th>
+                  <th scope="col">{t("common.amount")}</th>
+                  <th scope="col">{t("common.description")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +168,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </EmptyState>
           )}
           <div className="field">
-            <label htmlFor="imp-asset">Cuenta activo</label>
+            <label htmlFor="imp-asset">{t("import.assetAccount")}</label>
             <select id="imp-asset" value={assetId || assets[0]?.id || ""} onChange={(e) => setAssetId(e.target.value)} disabled={assets.length === 0}>
               {assets.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -176,7 +176,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="imp-exp">Cuenta gasto</label>
+            <label htmlFor="imp-exp">{t("import.expenseAccount")}</label>
             <select id="imp-exp" value={expenseId || expenses[0]?.id || ""} onChange={(e) => setExpenseId(e.target.value)} disabled={expenses.length === 0}>
               {expenses.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -184,7 +184,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="imp-inc">Cuenta ingreso</label>
+            <label htmlFor="imp-inc">{t("import.incomeAccount")}</label>
             <select id="imp-inc" value={incomeId || incomes[0]?.id || ""} onChange={(e) => setIncomeId(e.target.value)} disabled={incomes.length === 0}>
               {incomes.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -192,7 +192,7 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </select>
           </div>
           <button type="button" className="btn" onClick={() => commit()} disabled={busy || !canCommit} aria-busy={busy}>
-            {busy ? "Importando…" : "Confirmar importación"}
+            {busy ? t("common.importing") : t("import.confirmImport")}
           </button>
         </>
       )}

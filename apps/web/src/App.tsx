@@ -136,10 +136,10 @@ export function App() {
       });
       await refreshMe();
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Error al inicializar";
+      const message = e instanceof Error ? e.message : t("errors.init");
       if (message === "Instance already initialized") {
         setInstanceInitialized(true);
-        setError("Esta instancia ya está configurada. Inicia sesión con tu correo y contraseña.");
+        setError(t("auth.alreadyInitialized"));
       } else {
         setError(message);
       }
@@ -155,7 +155,7 @@ export function App() {
       });
       await refreshMe();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al iniciar sesión");
+      setError(e instanceof Error ? e.message : t("errors.login"));
     }
   }
 
@@ -462,23 +462,23 @@ export function App() {
             )}
             <div className="toolbar">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => loadAccounts()}>
-                Cargar cuentas
+                {t("reconciliation.loadAccounts")}
               </button>
             </div>
             {accounts.length > 0 && (
               <>
               <div className="form-grid form-grid--2">
                 <div className="field">
-                  <label htmlFor="reconcile-from">Desde (opcional)</label>
+                  <label htmlFor="reconcile-from">{t("reconciliation.fromDate", { optional: t("common.optional") })}</label>
                   <input id="reconcile-from" type="date" value={reconcileFrom} onChange={(e) => setReconcileFrom(e.target.value)} />
                 </div>
                 <div className="field">
-                  <label htmlFor="reconcile-to">Hasta (opcional)</label>
+                  <label htmlFor="reconcile-to">{t("reconciliation.toDate", { optional: t("common.optional") })}</label>
                   <input id="reconcile-to" type="date" value={reconcileTo} onChange={(e) => setReconcileTo(e.target.value)} />
                 </div>
               </div>
               <div className="field">
-                <label htmlFor="reconcile-account">Cuenta</label>
+                <label htmlFor="reconcile-account">{t("common.account")}</label>
                 <select
                   id="reconcile-account"
                   value={reconcileAccountId}
@@ -500,7 +500,7 @@ export function App() {
                 onClick={() => loadUncleared()}
                 disabled={reconcileLoading}
               >
-                {reconcileLoading ? "Cargando…" : "Ver movimientos sin conciliar"}
+                {reconcileLoading ? t("common.loading") : t("reconciliation.loadUncleared")}
               </button>
             )}
             {uncleared.length === 0 && reconcileAccountId && !reconcileLoading && (
@@ -515,10 +515,15 @@ export function App() {
                     <span>
                       <strong>{row.txnDate}</strong>
                       {" — "}
-                      {row.description ?? "Sin descripción"}
+                      {row.description ?? t("common.noDescription")}
                       {" "}
                       <span className="muted">
-                        (D {formatMinorDisplay(row.debitMinor, "MXN")} / C {formatMinorDisplay(row.creditMinor, "MXN")})
+                        {t("reconciliation.splitAmounts", {
+                          debitLabel: t("reconciliation.debitAbbrev"),
+                          creditLabel: t("reconciliation.creditAbbrev"),
+                          debit: formatMinorDisplay(row.debitMinor, "MXN"),
+                          credit: formatMinorDisplay(row.creditMinor, "MXN"),
+                        })}
                       </span>
                     </span>
                     <button
@@ -526,10 +531,13 @@ export function App() {
                       className="btn btn-sm"
                       disabled={reconcileRowBusy === row.splitId}
                       aria-busy={reconcileRowBusy === row.splitId}
-                      aria-label={`Marcar conciliado: ${row.txnDate}, ${row.description ?? "Sin descripción"}`}
+                      aria-label={t("reconciliation.markReconciledAria", {
+                        date: row.txnDate,
+                        description: row.description ?? t("common.noDescription"),
+                      })}
                       onClick={() => markReconciled(row.splitId)}
                     >
-                      {reconcileRowBusy === row.splitId ? "Guardando…" : "Marcar conciliado"}
+                      {reconcileRowBusy === row.splitId ? t("common.saving") : t("reconciliation.markReconciled")}
                     </button>
                   </li>
                 ))}

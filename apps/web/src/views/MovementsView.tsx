@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { EmptyState } from "../components/EmptyState.js";
 import { parseToMinor } from "@finllm/money";
 import { api } from "../lib/api.js";
+import { accountTypeLabel } from "../lib/format.js";
 import { postTransactionViaConfirm } from "../lib/confirm-post.js";
 import type { AccountRow } from "../lib/types.js";
 
@@ -40,7 +41,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
     const payFrom = assetId || assets[0]?.id;
     const cat = categoryId || categories[0]?.id;
     if (!payFrom || !cat) {
-      setError("Crea al menos una cuenta de activo y una de gasto o ingreso.");
+      setError(t("movements.missingAccountsSubmit"));
       return;
     }
     setBusy(true);
@@ -60,10 +61,10 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
       await postTransactionViaConfirm({ txnDate, description, splits });
       setAmount("");
       setDescription("");
-      setSuccess("Movimiento registrado correctamente.");
+      setSuccess(t("movements.postedSuccess"));
       onPosted();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al registrar");
+      setError(err instanceof Error ? err.message : t("movements.errors.post"));
     } finally {
       setBusy(false);
     }
@@ -86,10 +87,10 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
       });
       setNewCode("");
       setNewName("");
-      setSuccess("Cuenta creada.");
+      setSuccess(t("movements.accountCreatedSuccess"));
       onAccountsChanged();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear cuenta");
+      setError(err instanceof Error ? err.message : t("movements.errors.createAccount"));
     }
   }
 
@@ -125,11 +126,11 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           </button>
         </div>
         <div className="field">
-          <label htmlFor="txn-date">Fecha</label>
+          <label htmlFor="txn-date">{t("common.date")}</label>
           <input id="txn-date" type="date" value={txnDate} onChange={(e) => setTxnDate(e.target.value)} required />
         </div>
         <div className="field">
-          <label htmlFor="txn-amount">Monto (MXN)</label>
+          <label htmlFor="txn-amount">{t("common.amountMxn")}</label>
           <input
             id="txn-amount"
             inputMode="decimal"
@@ -141,11 +142,11 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           />
         </div>
         <div className="field">
-          <label htmlFor="txn-desc">Descripción</label>
+          <label htmlFor="txn-desc">{t("common.description")}</label>
           <input id="txn-desc" value={description} onChange={(e) => setDescription(e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="txn-asset">Cuenta de pago / depósito</label>
+          <label htmlFor="txn-asset">{t("movements.paymentAccount")}</label>
           <select
             id="txn-asset"
             value={assetId || assets[0]?.id || ""}
@@ -153,7 +154,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
             disabled={assets.length === 0}
           >
             {assets.length === 0 ? (
-              <option value="">Sin cuentas de activo</option>
+              <option value="">{t("movements.noAssetAccounts")}</option>
             ) : (
               assets.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -162,7 +163,9 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           </select>
         </div>
         <div className="field">
-          <label htmlFor="txn-cat">{kind === "expense" ? "Categoría de gasto" : "Categoría de ingreso"}</label>
+          <label htmlFor="txn-cat">
+            {kind === "expense" ? t("movements.expenseCategory") : t("movements.incomeCategory")}
+          </label>
           <select
             id="txn-cat"
             value={categoryId || categories[0]?.id || ""}
@@ -170,7 +173,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
             disabled={categories.length === 0}
           >
             {categories.length === 0 ? (
-              <option value="">Sin categorías</option>
+              <option value="">{t("movements.noCategories")}</option>
             ) : (
               categories.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -179,32 +182,32 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           </select>
         </div>
         <button type="submit" className="btn" disabled={busy || !canPost} aria-busy={busy}>
-          {busy ? "Guardando…" : "Registrar"}
+          {busy ? t("common.saving") : t("movements.submit")}
         </button>
         {success && <p className="status-banner status-banner--success" role="status">{success}</p>}
         {error && <p className="alert" id={errorId} role="alert">{error}</p>}
       </form>
 
       <details className="card" style={{ marginTop: "1.25rem", padding: "0.75rem" }}>
-        <summary>Nueva cuenta</summary>
+        <summary>{t("movements.newAccountSummary")}</summary>
         <form onSubmit={createAccount} style={{ marginTop: "0.75rem" }}>
           <div className="field">
-            <label htmlFor="acc-code">Código</label>
+            <label htmlFor="acc-code">{t("common.code")}</label>
             <input id="acc-code" value={newCode} onChange={(e) => setNewCode(e.target.value)} required />
           </div>
           <div className="field">
-            <label htmlFor="acc-name">Nombre</label>
+            <label htmlFor="acc-name">{t("common.name")}</label>
             <input id="acc-name" value={newName} onChange={(e) => setNewName(e.target.value)} required />
           </div>
           <div className="field">
-            <label htmlFor="acc-type">Tipo</label>
+            <label htmlFor="acc-type">{t("common.type")}</label>
             <select id="acc-type" value={newType} onChange={(e) => setNewType(e.target.value as typeof newType)}>
-              <option value="ASSET">Activo</option>
-              <option value="EXPENSE">Gasto</option>
-              <option value="INCOME">Ingreso</option>
+              <option value="ASSET">{accountTypeLabel("ASSET")}</option>
+              <option value="EXPENSE">{accountTypeLabel("EXPENSE")}</option>
+              <option value="INCOME">{accountTypeLabel("INCOME")}</option>
             </select>
           </div>
-          <button type="submit" className="btn btn-ghost btn-sm">Crear cuenta</button>
+          <button type="submit" className="btn btn-ghost btn-sm">{t("movements.createAccount")}</button>
         </form>
       </details>
     </section>

@@ -46,11 +46,11 @@ export function BudgetsView({ accounts }: Props) {
       const data = await api<{ budgets: Budget[] }>("/api/v1/budgets");
       setList(data.budgets);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudieron cargar los presupuestos");
+      setError(err instanceof Error ? err.message : t("budgets.errors.loadList"));
     } finally {
       setListLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load().catch(() => undefined);
@@ -60,19 +60,19 @@ export function BudgetsView({ accounts }: Props) {
     setSelected(b.id);
     setSelectedName(b.name);
     setVarianceLoading(true);
-    setStatus(`Cargando variación de ${b.name}…`);
+    setStatus(t("budgets.loadingVarianceFor", { name: b.name }));
     setError(null);
     try {
       const data = await api<{ lines: VarianceLine[] }>(`/api/v1/budgets/${b.id}/variance`);
       setVariance(data.lines);
       setStatus(
         data.lines.length === 0
-          ? `Sin líneas de variación para ${b.name}.`
-          : `Variación cargada para ${b.name} (${data.lines.length} líneas).`,
+          ? t("budgets.varianceEmpty", { name: b.name })
+          : t("budgets.varianceLoaded", { name: b.name, count: data.lines.length }),
       );
     } catch (err) {
       setVariance([]);
-      setError(err instanceof Error ? err.message : "Error al cargar variación");
+      setError(err instanceof Error ? err.message : t("budgets.errors.loadVariance"));
     } finally {
       setVarianceLoading(false);
     }
@@ -84,7 +84,7 @@ export function BudgetsView({ accounts }: Props) {
     setStatus("");
     const acc = lineAccountId || expenseAccounts[0]?.id;
     if (!acc || !lineAmount) {
-      setError("Indica cuenta de gasto y monto presupuestado.");
+      setError(t("budgets.needLine"));
       return;
     }
     setBusy(true);
@@ -101,10 +101,10 @@ export function BudgetsView({ accounts }: Props) {
       });
       setName("");
       setLineAmount("");
-      setStatus("Presupuesto creado.");
+      setStatus(t("budgets.createdSuccess"));
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear presupuesto");
+      setError(err instanceof Error ? err.message : t("budgets.errors.create"));
     } finally {
       setBusy(false);
     }
@@ -112,25 +112,25 @@ export function BudgetsView({ accounts }: Props) {
 
   return (
     <section className="card" aria-labelledby="view-title">
-      <p className="muted">Crea un presupuesto y compara contra movimientos del periodo.</p>
+      <p className="muted">{t("budgets.intro")}</p>
       <p className="sr-only" aria-live="polite">{status}</p>
       <form onSubmit={createBudget} aria-busy={busy}>
         <div className="field">
-          <label htmlFor="bud-name">Nombre</label>
+          <label htmlFor="bud-name">{t("budgets.name")}</label>
           <input id="bud-name" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="form-grid form-grid--2">
           <div className="field">
-            <label htmlFor="bud-start">Inicio</label>
+            <label htmlFor="bud-start">{t("budgets.periodStart")}</label>
             <input id="bud-start" type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} required />
           </div>
           <div className="field">
-            <label htmlFor="bud-end">Fin</label>
+            <label htmlFor="bud-end">{t("budgets.periodEnd")}</label>
             <input id="bud-end" type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} required />
           </div>
         </div>
         <div className="field">
-          <label htmlFor="bud-acc">Cuenta de gasto</label>
+          <label htmlFor="bud-acc">{t("budgets.expenseAccount")}</label>
           <select
             id="bud-acc"
             value={lineAccountId || expenseAccounts[0]?.id || ""}
@@ -138,7 +138,7 @@ export function BudgetsView({ accounts }: Props) {
             disabled={expenseAccounts.length === 0}
           >
             {expenseAccounts.length === 0 ? (
-              <option value="">Sin cuentas de gasto</option>
+              <option value="">{t("budgets.noExpenseAccounts")}</option>
             ) : (
               expenseAccounts.map((a) => (
                 <option key={a.id} value={a.id}>{a.code} — {a.name}</option>
@@ -147,16 +147,16 @@ export function BudgetsView({ accounts }: Props) {
           </select>
         </div>
         <div className="field">
-          <label htmlFor="bud-amt">Monto presupuestado (MXN)</label>
+          <label htmlFor="bud-amt">{t("budgets.budgetedAmount")}</label>
           <input id="bud-amt" value={lineAmount} onChange={(e) => setLineAmount(e.target.value)} required />
         </div>
         <button type="submit" className="btn btn-sm" disabled={busy || expenseAccounts.length === 0}>
-          {busy ? "Creando…" : "Crear presupuesto"}
+          {busy ? t("common.creating") : t("budgets.createBudget")}
         </button>
       </form>
       {error && <p className="alert" role="alert">{error}</p>}
 
-      {listLoading && <p className="muted" role="status">Cargando presupuestos…</p>}
+      {listLoading && <p className="muted" role="status">{t("budgets.loadingList")}</p>}
       {!listLoading && list.length === 0 && (
         <EmptyState illustration="chart" title={t("budgets.emptyTitle")}>
           {t("budgets.emptyBody")}
@@ -172,28 +172,28 @@ export function BudgetsView({ accounts }: Props) {
                 type="button"
                 className="btn btn-sm btn-ghost"
                 disabled={varianceLoading}
-                aria-label={`Ver variación de ${b.name}`}
+                aria-label={t("budgets.viewVarianceAria", { name: b.name })}
                 onClick={() => loadVariance(b)}
               >
-                Ver variación
+                {t("budgets.viewVariance")}
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      {selected && varianceLoading && <p className="muted" role="status">Cargando variación…</p>}
+      {selected && varianceLoading && <p className="muted" role="status">{t("budgets.loadingVariance")}</p>}
 
       {selected && !varianceLoading && variance.length > 0 && (
         <div className="table-wrap" style={{ marginTop: "1rem" }}>
           <table className="data-table">
-            <caption className="sr-only">Variación del presupuesto {selectedName}</caption>
+            <caption className="sr-only">{t("budgets.varianceCaption", { name: selectedName })}</caption>
             <thead>
               <tr>
-                <th scope="col">Cuenta</th>
-                <th scope="col" className="amount-cell">Presupuesto</th>
-                <th scope="col" className="amount-cell">Real</th>
-                <th scope="col" className="amount-cell">Variación</th>
+                <th scope="col">{t("common.account")}</th>
+                <th scope="col" className="amount-cell">{t("budgets.columnBudgeted")}</th>
+                <th scope="col" className="amount-cell">{t("budgets.columnActual")}</th>
+                <th scope="col" className="amount-cell">{t("budgets.columnVariance")}</th>
               </tr>
             </thead>
             <tbody>

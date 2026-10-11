@@ -15,16 +15,34 @@
   },
   "common": {
     "loading": "Loading…",
+    "saving": "Saving…",
+    "processing": "Processing…",
+    "creating": "Creating…",
+    "importing": "Importing…",
     "logout": "Sign out",
     "email": "Email",
     "password": "Password",
     "skipToContent": "Skip to content",
     "update": "Refresh",
     "code": "Code",
+    "name": "Name",
     "account": "Account",
     "type": "Type",
     "balance": "Balance",
-    "language": "Language"
+    "language": "Language",
+    "date": "Date",
+    "amount": "Amount",
+    "amountMxn": "Amount (MXN)",
+    "description": "Description",
+    "noDescription": "No description",
+    "optional": "optional"
+  },
+  "accountTypes": {
+    "ASSET": "Asset",
+    "LIABILITY": "Liability",
+    "EQUITY": "Equity",
+    "INCOME": "Income",
+    "EXPENSE": "Expense"
   },
   "auth": {
     "checking": "Checking instance…",
@@ -33,7 +51,8 @@
     "passwordNew": "Password (min. 12 characters)",
     "initialize": "Initialize instance",
     "signIn": "Sign in",
-    "haveAccount": "I already have an account"
+    "haveAccount": "I already have an account",
+    "alreadyInitialized": "This instance is already set up. Sign in with your email and password."
   },
   "theme": {
     "label": "Theme",
@@ -65,36 +84,109 @@
     "intro": "Record an expense or income in MXN (double-entry applied automatically).",
     "missingAccountsTitle": "Accounts required",
     "missingAccounts": "Create at least one asset account and one {{kind}} account under «New account».",
+    "missingAccountsSubmit": "Create at least one asset account and one expense or income account.",
     "expenseKind": "expense",
     "incomeKind": "income",
     "expense": "Expense",
     "income": "Income",
-    "typeGroup": "Transaction type"
+    "typeGroup": "Transaction type",
+    "paymentAccount": "Payment / deposit account",
+    "expenseCategory": "Expense category",
+    "incomeCategory": "Income category",
+    "noAssetAccounts": "No asset accounts",
+    "noCategories": "No categories",
+    "submit": "Post transaction",
+    "postedSuccess": "Transaction recorded.",
+    "accountCreatedSuccess": "Account created.",
+    "newAccountSummary": "New account",
+    "createAccount": "Create account",
+    "errors": {
+      "post": "Could not post transaction",
+      "createAccount": "Could not create account"
+    }
   },
   "import": {
     "accountsIncompleteTitle": "Accounts incomplete",
-    "accountsIncomplete": "Create asset, expense, and income accounts before confirming the import."
+    "accountsIncomplete": "Create asset, expense, and income accounts before confirming the import.",
+    "formatHint": "Format: date,amount,description,external_ref (header optional).",
+    "chooseFile": "Choose CSV file",
+    "pasteHint": "Or paste content below.",
+    "csvContent": "CSV content",
+    "preview": "Preview",
+    "confirmImport": "Confirm import",
+    "previewEmpty": "Preview has no rows.",
+    "previewReady": "{{count}} rows ready to import.",
+    "previewFailed": "Preview failed",
+    "fileLoaded": "File {{name}} loaded. Review and click Preview.",
+    "selectDefaultAccounts": "Select default asset, expense, and income accounts.",
+    "importComplete": "Import completed.",
+    "importFailed": "Import failed",
+    "rowsReady": "{{count}} rows ready to import.",
+    "rowsReadyTruncated": " Showing the first 20 in the table.",
+    "previewCaption": "Import preview ({{shown}} of {{total}} rows)",
+    "externalRef": "External ref",
+    "assetAccount": "Asset account",
+    "expenseAccount": "Expense account",
+    "incomeAccount": "Income account"
   },
   "budgets": {
+    "intro": "Create a budget and compare against transactions in the period.",
     "emptyTitle": "No budgets",
-    "emptyBody": "Set a period and amounts per expense account to track spending."
+    "emptyBody": "Set a period and amounts per expense account to track spending.",
+    "name": "Budget name",
+    "periodStart": "Start",
+    "periodEnd": "End",
+    "expenseAccount": "Expense account",
+    "noExpenseAccounts": "No expense accounts",
+    "budgetedAmount": "Budgeted amount (MXN)",
+    "createBudget": "Create budget",
+    "loadingList": "Loading budgets…",
+    "viewVariance": "View variance",
+    "viewVarianceAria": "View variance for {{name}}",
+    "loadingVariance": "Loading variance…",
+    "loadingVarianceFor": "Loading variance for {{name}}…",
+    "varianceEmpty": "No variance lines for {{name}}.",
+    "varianceLoaded": "Variance loaded for {{name}} ({{count}} lines).",
+    "varianceCaption": "Budget variance: {{name}}",
+    "columnBudgeted": "Budgeted",
+    "columnActual": "Actual",
+    "columnVariance": "Variance",
+    "needLine": "Select an expense account and budgeted amount.",
+    "createdSuccess": "Budget created.",
+    "errors": {
+      "loadList": "Could not load budgets",
+      "loadVariance": "Could not load variance",
+      "create": "Could not create budget"
+    }
   },
   "investments": {
     "intro": "Positions modeled as asset accounts in the ledger. Performance, lots, and IRR are not in this version; use the MCP harness for advanced operations.",
     "emptyTitle": "No positions",
-    "emptyBody": "No asset accounts with balance. Create an ASSET account under Transactions."
+    "emptyBody": "No asset accounts with balance. Create an ASSET account under Transactions.",
+    "positionsCaption": "Investment positions by account"
   },
   "reconciliation": {
     "intro": "Filter by statement period and mark items reconciled.",
     "emptyTitle": "No items loaded",
     "emptyBody": "Click «Load uncleared items» to search in the selected period.",
-    "reconciledSuccess": "Item marked reconciled."
+    "reconciledSuccess": "Item marked reconciled.",
+    "loadAccounts": "Load accounts",
+    "fromDate": "From ({{optional}})",
+    "toDate": "To ({{optional}})",
+    "loadUncleared": "Load uncleared items",
+    "markReconciled": "Mark reconciled",
+    "markReconciledAria": "Mark reconciled: {{date}}, {{description}}",
+    "splitAmounts": "({{debitLabel}} {{debit}} / {{creditLabel}} {{credit}})",
+    "debitAbbrev": "Dr",
+    "creditAbbrev": "Cr"
   },
   "status": {
     "view": "Current view: {{title}}"
   },
   "errors": {
     "balances": "Could not load balances",
-    "reconcile": "Could not reconcile item"
+    "reconcile": "Could not reconcile item",
+    "init": "Could not initialize instance",
+    "login": "Could not sign in"
   }
 }

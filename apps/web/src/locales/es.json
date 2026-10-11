@@ -15,16 +15,34 @@
   },
   "common": {
     "loading": "Cargando…",
+    "saving": "Guardando…",
+    "processing": "Procesando…",
+    "creating": "Creando…",
+    "importing": "Importando…",
     "logout": "Salir",
     "email": "Correo",
     "password": "Contraseña",
     "skipToContent": "Ir al contenido",
     "update": "Actualizar",
     "code": "Código",
+    "name": "Nombre",
     "account": "Cuenta",
     "type": "Tipo",
     "balance": "Saldo",
-    "language": "Idioma"
+    "language": "Idioma",
+    "date": "Fecha",
+    "amount": "Monto",
+    "amountMxn": "Monto (MXN)",
+    "description": "Descripción",
+    "noDescription": "Sin descripción",
+    "optional": "opcional"
+  },
+  "accountTypes": {
+    "ASSET": "Activo",
+    "LIABILITY": "Pasivo",
+    "EQUITY": "Capital",
+    "INCOME": "Ingreso",
+    "EXPENSE": "Gasto"
   },
   "auth": {
     "checking": "Comprobando instancia…",
@@ -33,7 +51,8 @@
     "passwordNew": "Contraseña (mín. 12 caracteres)",
     "initialize": "Inicializar instancia",
     "signIn": "Iniciar sesión",
-    "haveAccount": "Ya tengo cuenta"
+    "haveAccount": "Ya tengo cuenta",
+    "alreadyInitialized": "Esta instancia ya está configurada. Inicia sesión con tu correo y contraseña."
   },
   "theme": {
     "label": "Tema",
@@ -65,36 +84,109 @@
     "intro": "Registra un gasto o ingreso en MXN (doble partida automática).",
     "missingAccountsTitle": "Faltan cuentas",
     "missingAccounts": "Crea al menos una cuenta de activo y una de {{kind}} en «Nueva cuenta».",
+    "missingAccountsSubmit": "Crea al menos una cuenta de activo y una de gasto o ingreso.",
     "expenseKind": "gasto",
     "incomeKind": "ingreso",
     "expense": "Gasto",
     "income": "Ingreso",
-    "typeGroup": "Tipo de movimiento"
+    "typeGroup": "Tipo de movimiento",
+    "paymentAccount": "Cuenta de pago / depósito",
+    "expenseCategory": "Categoría de gasto",
+    "incomeCategory": "Categoría de ingreso",
+    "noAssetAccounts": "Sin cuentas de activo",
+    "noCategories": "Sin categorías",
+    "submit": "Registrar",
+    "postedSuccess": "Movimiento registrado correctamente.",
+    "accountCreatedSuccess": "Cuenta creada.",
+    "newAccountSummary": "Nueva cuenta",
+    "createAccount": "Crear cuenta",
+    "errors": {
+      "post": "Error al registrar",
+      "createAccount": "Error al crear cuenta"
+    }
   },
   "import": {
     "accountsIncompleteTitle": "Cuentas incompletas",
-    "accountsIncomplete": "Crea cuentas de activo, gasto e ingreso antes de confirmar la importación."
+    "accountsIncomplete": "Crea cuentas de activo, gasto e ingreso antes de confirmar la importación.",
+    "formatHint": "Formato: date,amount,description,external_ref (encabezado opcional).",
+    "chooseFile": "Elegir archivo CSV",
+    "pasteHint": "O pega el contenido abajo.",
+    "csvContent": "Contenido CSV",
+    "preview": "Vista previa",
+    "confirmImport": "Confirmar importación",
+    "previewEmpty": "Vista previa sin filas.",
+    "previewReady": "{{count}} filas listas para importar.",
+    "previewFailed": "Vista previa fallida",
+    "fileLoaded": "Archivo {{name}} cargado. Revisa y pulsa Vista previa.",
+    "selectDefaultAccounts": "Selecciona cuentas por defecto para activo, gasto e ingreso.",
+    "importComplete": "Importación completada.",
+    "importFailed": "Importación fallida",
+    "rowsReady": "{{count}} filas listas para importar.",
+    "rowsReadyTruncated": " Mostrando las primeras 20 en la tabla.",
+    "previewCaption": "Vista previa de importación ({{shown}} de {{total}} filas)",
+    "externalRef": "Ref. externa",
+    "assetAccount": "Cuenta activo",
+    "expenseAccount": "Cuenta gasto",
+    "incomeAccount": "Cuenta ingreso"
   },
   "budgets": {
+    "intro": "Crea un presupuesto y compara contra movimientos del periodo.",
     "emptyTitle": "Sin presupuestos",
-    "emptyBody": "Define un periodo y montos por cuenta de gasto para hacer seguimiento."
+    "emptyBody": "Define un periodo y montos por cuenta de gasto para hacer seguimiento.",
+    "name": "Nombre del presupuesto",
+    "periodStart": "Inicio",
+    "periodEnd": "Fin",
+    "expenseAccount": "Cuenta de gasto",
+    "noExpenseAccounts": "Sin cuentas de gasto",
+    "budgetedAmount": "Monto presupuestado (MXN)",
+    "createBudget": "Crear presupuesto",
+    "loadingList": "Cargando presupuestos…",
+    "viewVariance": "Ver variación",
+    "viewVarianceAria": "Ver variación de {{name}}",
+    "loadingVariance": "Cargando variación…",
+    "loadingVarianceFor": "Cargando variación de {{name}}…",
+    "varianceEmpty": "Sin líneas de variación para {{name}}.",
+    "varianceLoaded": "Variación cargada para {{name}} ({{count}} líneas).",
+    "varianceCaption": "Variación del presupuesto {{name}}",
+    "columnBudgeted": "Presupuesto",
+    "columnActual": "Real",
+    "columnVariance": "Variación",
+    "needLine": "Indica cuenta de gasto y monto presupuestado.",
+    "createdSuccess": "Presupuesto creado.",
+    "errors": {
+      "loadList": "No se pudieron cargar los presupuestos",
+      "loadVariance": "Error al cargar variación",
+      "create": "Error al crear presupuesto"
+    }
   },
   "investments": {
     "intro": "Posiciones modeladas como cuentas de activo en el libro. Rendimiento, lotes e IRR no están en esta versión; usa el harness MCP para operaciones avanzadas.",
     "emptyTitle": "Sin posiciones",
-    "emptyBody": "No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos."
+    "emptyBody": "No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos.",
+    "positionsCaption": "Posiciones de inversión por cuenta"
   },
   "reconciliation": {
     "intro": "Filtra por periodo del estado de cuenta y marca partidas conciliadas.",
     "emptyTitle": "Sin partidas cargadas",
     "emptyBody": "Pulsa «Ver movimientos sin conciliar» para buscar en el periodo seleccionado.",
-    "reconciledSuccess": "Partida marcada como conciliada."
+    "reconciledSuccess": "Partida marcada como conciliada.",
+    "loadAccounts": "Cargar cuentas",
+    "fromDate": "Desde ({{optional}})",
+    "toDate": "Hasta ({{optional}})",
+    "loadUncleared": "Ver movimientos sin conciliar",
+    "markReconciled": "Marcar conciliado",
+    "markReconciledAria": "Marcar conciliado: {{date}}, {{description}}",
+    "splitAmounts": "({{debitLabel}} {{debit}} / {{creditLabel}} {{credit}})",
+    "debitAbbrev": "D",
+    "creditAbbrev": "C"
   },
   "status": {
     "view": "Vista actual: {{title}}"
   },
   "errors": {
     "balances": "No se pudieron cargar los saldos",
-    "reconcile": "No se pudo conciliar la partida"
+    "reconcile": "No se pudo conciliar la partida",
+    "init": "Error al inicializar",
+    "login": "Error al iniciar sesión"
   }
 }

@@ -26,11 +26,11 @@ export function InvestmentsView({ balances, balancesLoading }: Props) {
         assets.length > 0 && (
           <div className="table-wrap">
             <table className="data-table">
-              <caption className="sr-only">Posiciones de inversión por cuenta</caption>
+              <caption className="sr-only">{t("investments.positionsCaption")}</caption>
               <thead>
                 <tr>
-                  <th scope="col">Cuenta</th>
-                  <th scope="col" className="amount-cell">Saldo</th>
+                  <th scope="col">{t("common.account")}</th>
+                  <th scope="col" className="amount-cell">{t("common.balance")}</th>
                 </tr>
               </thead>
               <tbody>

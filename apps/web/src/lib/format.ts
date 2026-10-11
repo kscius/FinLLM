@@ -1,4 +1,5 @@
 import { formatDisplay, type CurrencyCode } from "@finllm/money";
+import { i18n } from "./i18n.js";
 
 export function formatMinorDisplay(minor: string, currency: CurrencyCode = "MXN"): string {
   try {
@@ -9,12 +10,9 @@ export function formatMinorDisplay(minor: string, currency: CurrencyCode = "MXN"
 }
 
 export function accountTypeLabel(type: string): string {
-  const map: Record<string, string> = {
-    ASSET: "Activo",
-    LIABILITY: "Pasivo",
-    EQUITY: "Capital",
-    INCOME: "Ingreso",
-    EXPENSE: "Gasto",
-  };
-  return map[type] ?? type;
+  const key = `accountTypes.${type}`;
+  if (i18n.isInitialized && i18n.exists(key)) {
+    return i18n.t(key);
+  }
+  return type;
 }
