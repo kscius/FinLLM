@@ -9,11 +9,13 @@
 | CSV import preview + commit | Implemented | Duplicate via idempotency keys |
 | Budgets | Implemented | Web create/list + `GET /api/v1/budgets/:id/variance` |
 | Reconciliation UI | Implemented | Web uncleared list + date filter + mark reconciled |
-| Web UX / design system | Implemented | Marca SVG + favicon, iconos de navegación, estados vacíos ilustrados, barra activo/pasivo en resumen, hash routes, tema claro/oscuro, a11y ES |
+| Web UX / design system | Implemented | i18n en/es (default en, localStorage), gráficos Recharts, PWA, OG/PNG, marca SVG, hash routes (EN + slugs ES legacy), tema, axe Playwright en CI |
+| Web analytics API | Implemented | `GET /api/v1/analytics/net-worth-series`, `expenses-by-category` |
 | Investments | Partial | Web vista de activos; analytics/lotes Phase 4+ |
 | Web — movements / CSV | Implemented | Gasto/ingreso, import preview+commit, crear cuentas |
 | MCP read tools | Implemented | list_accounts, get_balances, list_transactions |
 | MCP mutations | Implemented | preview_post_transaction + commit_post_transaction (confirm flow) |
+| Security hardening | Implemented | CSP (nginx), Drizzle CVE patch, confirm-only txn writes, MCP token TTL/revoke, setup bootstrap |
 | Docker Compose | Implemented | postgres + api + web |
 | Backup / restore | Implemented | `scripts/backup-db.sh`, `restore-db.sh`, `verify-backup-restore.sh` (Docker pg fallback) |
 | Automated tests | Partial | Money + ledger + CSV import unit tests |

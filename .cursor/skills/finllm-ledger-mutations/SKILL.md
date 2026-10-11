@@ -23,7 +23,7 @@ Never call `commit_post_transaction` without a prior preview in the same convers
 
 ## Preconditions
 
-- MCP token must include **`ledger.write`** (create via `POST /api/v1/mcp/tokens`).
+- MCP token must include **`ledger.write`** (create via `POST /api/v1/mcp/tokens` with header **`X-Mcp-Write-Confirm: 1`**).
 - Use `list_accounts` to resolve valid `accountId` values; do not guess UUIDs.
 
 ## Double-entry

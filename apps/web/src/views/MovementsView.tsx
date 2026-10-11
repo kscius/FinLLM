@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { EmptyState } from "../components/EmptyState.js";
 import { parseToMinor } from "@finllm/money";
 import { api } from "../lib/api.js";
+import { postTransactionViaConfirm } from "../lib/confirm-post.js";
 import type { AccountRow } from "../lib/types.js";
 
 type Props = {
@@ -11,6 +13,7 @@ type Props = {
 };
 
 export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) {
+  const { t } = useTranslation();
   const [kind, setKind] = useState<"expense" | "income">("expense");
   const [txnDate, setTxnDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState("");
@@ -54,10 +57,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
               { accountId: payFrom, debitMinor: abs.toString(), creditMinor: "0" },
               { accountId: cat, debitMinor: "0", creditMinor: abs.toString() },
             ];
-      await api("/api/v1/transactions", {
-        method: "POST",
-        body: JSON.stringify({ txnDate, description, splits }),
-      });
+      await postTransactionViaConfirm({ txnDate, description, splits });
       setAmount("");
       setDescription("");
       setSuccess("Movimiento registrado correctamente.");
@@ -97,21 +97,23 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
 
   return (
     <section className="card" aria-labelledby="view-title">
-      <p className="muted">Registra un gasto o ingreso en MXN (doble partida automática).</p>
+      <p className="muted">{t("movements.intro")}</p>
       {!canPost && (
-        <EmptyState illustration="wallet" title="Faltan cuentas">
-          Crea al menos una cuenta de activo y una de {kind === "expense" ? "gasto" : "ingreso"} en «Nueva cuenta».
+        <EmptyState illustration="wallet" title={t("movements.missingAccountsTitle")}>
+          {t("movements.missingAccounts", {
+            kind: kind === "expense" ? t("movements.expenseKind") : t("movements.incomeKind"),
+          })}
         </EmptyState>
       )}
       <form onSubmit={submit} aria-busy={busy}>
-        <div role="group" aria-label="Tipo de movimiento" className="segmented">
+        <div role="group" aria-label={t("movements.typeGroup")} className="segmented">
           <button
             type="button"
             className="segmented-btn"
             aria-pressed={kind === "expense"}
             onClick={() => setKind("expense")}
           >
-            Gasto
+            {t("movements.expense")}
           </button>
           <button
             type="button"
@@ -119,7 +121,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
             aria-pressed={kind === "income"}
             onClick={() => setKind("income")}
           >
-            Ingreso
+            {t("movements.income")}
           </button>
         </div>
         <div className="field">

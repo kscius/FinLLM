@@ -631,6 +631,39 @@ summary:focus-visible {
   background: color-mix(in srgb, var(--ink-muted) 55%, var(--paper));
 }
 
+.charts-grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.chart-panel {
+  margin-bottom: 0;
+}
+
+.chart-heading {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.chart-wrap {
+  width: 100%;
+  min-height: 220px;
+}
+
+.auth-card .locale-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
 .segmented {
   display: inline-flex;
   border: 1px solid var(--border);

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { formatMinorDisplay } from "../lib/format.js";
 import type { BalanceRow } from "../lib/types.js";
 
@@ -20,6 +21,7 @@ function sumAbsMinor(rows: BalanceRow[], type: string): bigint {
 }
 
 export function BalanceBreakdown({ rows }: Props) {
+  const { t } = useTranslation();
   const assets = sumAbsMinor(rows, "ASSET");
   const liabilities = sumAbsMinor(rows, "LIABILITY");
   const total = assets + liabilities;
@@ -30,11 +32,11 @@ export function BalanceBreakdown({ rows }: Props) {
 
   return (
     <section className="breakdown" aria-labelledby="breakdown-heading">
-      <h3 id="breakdown-heading" className="breakdown-title">Composición del balance</h3>
+      <h3 id="breakdown-heading" className="breakdown-title">{t("breakdown.title")}</h3>
       <div
         className="breakdown-bar"
         role="img"
-        aria-label={`Activos ${assetPct.toFixed(0)} por ciento, pasivos ${liabPct.toFixed(0)} por ciento`}
+        aria-label={`${t("breakdown.assets")} ${assetPct.toFixed(0)}%, ${t("breakdown.liabilities")} ${liabPct.toFixed(0)}%`}
       >
         <span className="breakdown-seg breakdown-seg--asset" style={{ width: `${assetPct}%` }} />
         <span className="breakdown-seg breakdown-seg--liability" style={{ width: `${liabPct}%` }} />
@@ -42,11 +44,11 @@ export function BalanceBreakdown({ rows }: Props) {
       <ul className="breakdown-legend">
         <li>
           <span className="breakdown-dot breakdown-dot--asset" aria-hidden="true" />
-          Activos — {formatMinorDisplay(assets.toString(), "MXN")}
+          {t("breakdown.assets")} — {formatMinorDisplay(assets.toString(), "MXN")}
         </li>
         <li>
           <span className="breakdown-dot breakdown-dot--liability" aria-hidden="true" />
-          Pasivos — {formatMinorDisplay(liabilities.toString(), "MXN")}
+          {t("breakdown.liabilities")} — {formatMinorDisplay(liabilities.toString(), "MXN")}
         </li>
       </ul>
     </section>

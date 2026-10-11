@@ -13,8 +13,8 @@ pnpm --filter @finllm/mcp run build
 1. Sign in to the FinLLM web UI or API.
 2. `POST /api/v1/mcp/tokens` with body, for example:
    - Read only: `{ "name": "cursor-read", "scopes": ["ledger.read"] }`
-   - Read + post with confirm: `{ "name": "cursor-write", "scopes": ["ledger.read", "ledger.write"] }`
-3. Store the returned token securely; set `FINLLM_MCP_TOKEN` in your harness MCP env.
+   - Read + post with confirm: `{ "name": "cursor-write", "scopes": ["ledger.read", "ledger.write"] }` and header **`X-Mcp-Write-Confirm: 1`**
+3. Store the returned token securely; set `FINLLM_MCP_TOKEN` in your harness MCP env. Tokens expire after `MCP_TOKEN_DEFAULT_TTL_DAYS` (default 90). Revoke with `DELETE /api/v1/mcp/tokens/:id`; list with `GET /api/v1/mcp/tokens`.
 
 ## Cursor / Claude Desktop (stdio)
 

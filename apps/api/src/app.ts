@@ -28,6 +28,7 @@ import { seedSystemAccounts } from "./seed-accounts.js";
 import { createAndPostTransaction, computeNetWorthMxn, getAccountBalances } from "./services/ledger-service.js";
 import { getBudgetWithVariance } from "./services/budget-variance.js";
 import { parseCsvContent } from "./services/import-csv.js";
+import { getExpensesByCategory, getNetWorthSeries } from "./services/analytics-service.js";
 
 export async function buildApp(config: AppConfig) {
   const db = createDb(config.DATABASE_URL);
@@ -38,6 +39,7 @@ export async function buildApp(config: AppConfig) {
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: isProd ? "same-origin" : "cross-origin" },
     hsts: isProd ? { maxAge: 31_536_000, includeSubDomains: true } : false,
+    frameguard: { action: "deny" },
   });
   await app.register(rateLimit, {
     global: true,
@@ -64,7 +66,7 @@ export async function buildApp(config: AppConfig) {
 
   const authRateLimit = {
     rateLimit: {
-      max: 10,
+      max: 5,
       timeWindow: "15 minutes",
     },
   };
@@ -178,15 +180,21 @@ export async function buildApp(config: AppConfig) {
   });
 
   app.post("/api/v1/auth/login", { config: authRateLimit }, async (request, reply) => {
-    const body = z.object({ email: z.string().email(), password: z.string() }).parse(request.body);
+    const body = z
+      .object({ email: z.string().email(), password: z.string().min(12) })
+      .parse(request.body);
     const user = await db.query.users.findFirst({ where: eq(users.email, body.email) });
     if (!user || !(await bcrypt.compare(body.password, user.passwordHash))) {
       return reply.code(401).send({ error: "Invalid credentials" });
     }
     const token = generateToken();
+    const tokenHash = hashToken(token);
+    if (config.INVALIDATE_OTHER_SESSIONS_ON_LOGIN) {
+      await db.delete(sessions).where(eq(sessions.userId, user.id));
+    }
     await db.insert(sessions).values({
       userId: user.id,
-      tokenHash: hashToken(token),
+      tokenHash,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
     setSessionCookie(reply, token);
@@ -203,9 +211,14 @@ export async function buildApp(config: AppConfig) {
     return { ok: true };
   });
 
-  app.get("/api/v1/setup/status", async () => {
+  app.get("/api/v1/setup/status", async (request, reply) => {
     const existing = await db.query.users.findFirst();
-    return { initialized: Boolean(existing) };
+    const initialized = Boolean(existing);
+    if (initialized && !config.ALLOW_PUBLIC_SETUP_STATUS) {
+      const ctx = await resolveSession(request);
+      if (!ctx) return reply.code(403).send({ error: "Forbidden" });
+    }
+    return { initialized };
   });
 
   app.get("/api/v1/me", async (request, reply) => {
@@ -220,6 +233,12 @@ export async function buildApp(config: AppConfig) {
   app.post("/api/v1/setup/initialize", { config: setupRateLimit }, async (request, reply) => {
     const existing = await db.query.users.findFirst();
     if (existing) return reply.code(409).send({ error: "Instance already initialized" });
+    if (config.SETUP_BOOTSTRAP_SECRET) {
+      const bootstrap = request.headers["x-setup-bootstrap"];
+      if (bootstrap !== config.SETUP_BOOTSTRAP_SECRET) {
+        return reply.code(403).send({ error: "Setup bootstrap required" });
+      }
+    }
     const body = z
       .object({ email: z.string().email(), password: z.string().min(12), displayName: z.string().optional() })
       .parse(request.body);
@@ -284,44 +303,44 @@ export async function buildApp(config: AppConfig) {
     };
   });
 
-  app.post("/api/v1/transactions", async (request, reply) => {
+  app.get("/api/v1/analytics/net-worth-series", async (request, reply) => {
     const ctx = await requireAuth(request, reply);
     if (!ctx?.book) return;
-    const body = z
+    const query = z
       .object({
-        txnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-        description: z.string().optional(),
-        externalRef: z.string().optional(),
-        idempotencyKey: z.string().optional(),
-        mxnPerUsd: z.string().optional(),
-        splits: z
-          .array(
-            z.object({
-              accountId: z.string().uuid(),
-              debitMinor: z.string(),
-              creditMinor: z.string(),
-            }),
-          )
-          .min(2),
+        fromDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        toDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
       })
-      .parse(request.body);
+      .parse(request.query);
+    const toDate = query.toDate ?? new Date().toISOString().slice(0, 10);
+    const from = new Date(toDate);
+    from.setMonth(from.getMonth() - 12);
+    const fromDate = query.fromDate ?? from.toISOString().slice(0, 10);
+    const points = await getNetWorthSeries(db, ctx.book.id, fromDate, toDate);
+    return { fromDate, toDate, points };
+  });
 
-    const result = await createAndPostTransaction(db, {
-      bookId: ctx.book.id,
-      txnDate: body.txnDate,
-      description: body.description,
-      externalRef: body.externalRef,
-      idempotencyKey: body.idempotencyKey,
-      mxnPerUsd: body.mxnPerUsd,
-      bookCurrency: ctx.book.bookCurrencyCode as "MXN",
-      actor: `user:${ctx.user.id}`,
-      splits: body.splits.map((s) => ({
-        accountId: s.accountId,
-        debitMinor: BigInt(s.debitMinor),
-        creditMinor: BigInt(s.creditMinor),
-      })),
+  app.get("/api/v1/analytics/expenses-by-category", async (request, reply) => {
+    const ctx = await requireAuth(request, reply);
+    if (!ctx?.book) return;
+    const query = z
+      .object({
+        fromDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        toDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      })
+      .parse(request.query);
+    const toDate = query.toDate ?? new Date().toISOString().slice(0, 10);
+    const from = new Date(toDate);
+    from.setMonth(from.getMonth() - 1);
+    const fromDate = query.fromDate ?? from.toISOString().slice(0, 10);
+    const rows = await getExpensesByCategory(db, ctx.book.id, fromDate, toDate);
+    return { fromDate, toDate, categories: rows };
+  });
+
+  app.post("/api/v1/transactions", async (_request, reply) => {
+    return reply.code(410).send({
+      error: "Direct transaction POST removed; use POST /api/v1/confirm/preview then /api/v1/confirm/commit",
     });
-    return result;
   });
 
   app.post("/api/v1/imports/csv/preview", async (request, reply) => {
@@ -447,29 +466,84 @@ export async function buildApp(config: AppConfig) {
     return { budget };
   });
 
+  app.get("/api/v1/mcp/tokens", async (request, reply) => {
+    const ctx = await requireAuth(request, reply);
+    if (!ctx) return;
+    const rows = await db
+      .select({
+        id: mcpTokens.id,
+        name: mcpTokens.name,
+        scopes: mcpTokens.scopes,
+        expiresAt: mcpTokens.expiresAt,
+        revokedAt: mcpTokens.revokedAt,
+        createdAt: mcpTokens.createdAt,
+      })
+      .from(mcpTokens)
+      .where(eq(mcpTokens.userId, ctx.user.id));
+    return { tokens: rows };
+  });
+
+  app.delete("/api/v1/mcp/tokens/:id", async (request, reply) => {
+    const ctx = await requireAuth(request, reply);
+    if (!ctx) return;
+    const params = z.object({ id: z.string().uuid() }).parse(request.params);
+    const row = await db.query.mcpTokens.findFirst({
+      where: and(eq(mcpTokens.id, params.id), eq(mcpTokens.userId, ctx.user.id)),
+    });
+    if (!row) return reply.code(404).send({ error: "Token not found" });
+    if (row.revokedAt) return { ok: true, alreadyRevoked: true };
+    await db.update(mcpTokens).set({ revokedAt: new Date() }).where(eq(mcpTokens.id, params.id));
+    return { ok: true };
+  });
+
   app.post("/api/v1/mcp/tokens", async (request, reply) => {
     const ctx = await requireAuth(request, reply);
     if (!ctx) return;
     const body = z
       .object({
-        name: z.string(),
-        scopes: z.array(z.enum(["ledger.read", "ledger.write"])),
+        name: z.string().min(1).max(120),
+        scopes: z.array(z.enum(["ledger.read", "ledger.write"])).min(1),
+        expiresInDays: z.number().int().min(1).max(365).optional(),
       })
       .parse(request.body);
+    if (body.scopes.includes("ledger.write")) {
+      const bootstrap = request.headers["x-mcp-write-confirm"];
+      if (bootstrap !== "1") {
+        return reply.code(403).send({
+          error: "Creating ledger.write tokens requires header X-Mcp-Write-Confirm: 1",
+        });
+      }
+    }
+    const ttlDays = body.expiresInDays ?? config.MCP_TOKEN_DEFAULT_TTL_DAYS;
     const token = generateToken();
-    await db.insert(mcpTokens).values({
-      userId: ctx.user.id,
-      name: body.name,
-      tokenHash: hashToken(token),
+    const [row] = await db
+      .insert(mcpTokens)
+      .values({
+        userId: ctx.user.id,
+        name: body.name,
+        tokenHash: hashToken(token),
+        scopes: body.scopes,
+        expiresAt: new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000),
+      })
+      .returning({ id: mcpTokens.id, expiresAt: mcpTokens.expiresAt });
+    return {
+      id: row?.id,
+      token,
       scopes: body.scopes,
-    });
-    return { token, scopes: body.scopes, note: "Store this token securely; it will not be shown again." };
+      expiresAt: row?.expiresAt,
+      note: "Store this token securely; it will not be shown again.",
+    };
   });
 
   app.post("/api/v1/confirm/preview", async (request, reply) => {
     const ctx = await requireAuth(request, reply);
     if (!ctx?.book) return;
-    const body = z.object({ operation: z.string(), preview: z.record(z.unknown()) }).parse(request.body);
+    const body = z
+      .object({
+        operation: z.enum(["post_transaction"]),
+        preview: z.record(z.unknown()),
+      })
+      .parse(request.body);
     const payloadHash = sha256Payload(body.preview);
     const [row] = await db
       .insert(confirmTokens)

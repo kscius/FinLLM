@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { EmptyState } from "../components/EmptyState.js";
 import { formatMinorDisplay } from "../lib/format.js";
 import type { BalanceRow } from "../lib/types.js";
@@ -9,18 +10,16 @@ type Props = {
 
 /** Activos de inversión modelados como cuentas ASSET; módulo de portafolio completo en evolución futura. */
 export function InvestmentsView({ balances, balancesLoading }: Props) {
+  const { t } = useTranslation();
   const assets = balances?.filter((b) => b.type === "ASSET" && b.includeInNetWorth) ?? [];
 
   return (
     <section className="card" aria-labelledby="view-title">
-      <p className="muted">
-        Posiciones modeladas como cuentas de activo en el libro. Rendimiento, lotes e IRR no están en esta versión;
-        usa el harness MCP para operaciones avanzadas.
-      </p>
-      {balancesLoading && <p className="muted" role="status">Cargando saldos…</p>}
+      <p className="muted">{t("investments.intro")}</p>
+      {balancesLoading && <p className="muted" role="status">{t("common.loading")}</p>}
       {!balancesLoading && assets.length === 0 ? (
-        <EmptyState illustration="chart" title="Sin posiciones">
-          No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos.
+        <EmptyState illustration="chart" title={t("investments.emptyTitle")}>
+          {t("investments.emptyBody")}
         </EmptyState>
       ) : (
         !balancesLoading &&

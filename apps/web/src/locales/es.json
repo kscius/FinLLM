@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "FinLLM",
+    "tagline": "Libro contable personal",
+    "description": "FinLLM — libro contable personal autoalojado: patrimonio, movimientos, presupuestos e importación CSV."
+  },
+  "nav": {
+    "primary": "Navegación principal",
+    "overview": "Resumen",
+    "movements": "Movimientos",
+    "import": "Importar",
+    "budgets": "Presupuestos",
+    "investments": "Inversiones",
+    "reconciliation": "Conciliación"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "logout": "Salir",
+    "email": "Correo",
+    "password": "Contraseña",
+    "skipToContent": "Ir al contenido",
+    "update": "Actualizar",
+    "code": "Código",
+    "account": "Cuenta",
+    "type": "Tipo",
+    "balance": "Saldo",
+    "language": "Idioma"
+  },
+  "auth": {
+    "checking": "Comprobando instancia…",
+    "loginHint": "Tu libro contable personal. Inicia sesión con el correo y la contraseña de la configuración inicial.",
+    "initHint": "Finanzas personales autoalojadas. Crea la primera cuenta de propietario para inicializar esta instancia.",
+    "passwordNew": "Contraseña (mín. 12 caracteres)",
+    "initialize": "Inicializar instancia",
+    "signIn": "Iniciar sesión",
+    "haveAccount": "Ya tengo cuenta"
+  },
+  "theme": {
+    "label": "Tema",
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "overview": {
+    "netWorth": "Patrimonio neto (MXN)",
+    "accounts": "Cuentas",
+    "balancesCaption": "Saldos por cuenta",
+    "quickActions": "Acciones rápidas",
+    "recordMovement": "Registrar movimiento",
+    "importCsv": "Importar CSV",
+    "reconcile": "Conciliar",
+    "emptyTitle": "Sin movimientos aún",
+    "emptyBody": "Registra un gasto o ingreso en Movimientos, o importa un CSV para ver saldos aquí.",
+    "chartNetWorth": "Tendencia de patrimonio",
+    "chartExpenses": "Gastos por categoría (últimos 30 días)",
+    "chartEmpty": "Aún no hay datos suficientes para gráficos.",
+    "chartLoading": "Cargando gráficos…"
+  },
+  "breakdown": {
+    "title": "Composición del balance",
+    "assets": "Activos",
+    "liabilities": "Pasivos"
+  },
+  "movements": {
+    "intro": "Registra un gasto o ingreso en MXN (doble partida automática).",
+    "missingAccountsTitle": "Faltan cuentas",
+    "missingAccounts": "Crea al menos una cuenta de activo y una de {{kind}} en «Nueva cuenta».",
+    "expenseKind": "gasto",
+    "incomeKind": "ingreso",
+    "expense": "Gasto",
+    "income": "Ingreso",
+    "typeGroup": "Tipo de movimiento"
+  },
+  "import": {
+    "accountsIncompleteTitle": "Cuentas incompletas",
+    "accountsIncomplete": "Crea cuentas de activo, gasto e ingreso antes de confirmar la importación."
+  },
+  "budgets": {
+    "emptyTitle": "Sin presupuestos",
+    "emptyBody": "Define un periodo y montos por cuenta de gasto para hacer seguimiento."
+  },
+  "investments": {
+    "intro": "Posiciones modeladas como cuentas de activo en el libro. Rendimiento, lotes e IRR no están en esta versión; usa el harness MCP para operaciones avanzadas.",
+    "emptyTitle": "Sin posiciones",
+    "emptyBody": "No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos."
+  },
+  "reconciliation": {
+    "intro": "Filtra por periodo del estado de cuenta y marca partidas conciliadas.",
+    "emptyTitle": "Sin partidas cargadas",
+    "emptyBody": "Pulsa «Ver movimientos sin conciliar» para buscar en el periodo seleccionado.",
+    "reconciledSuccess": "Partida marcada como conciliada."
+  },
+  "status": {
+    "view": "Vista actual: {{title}}"
+  },
+  "errors": {
+    "balances": "No se pudieron cargar los saldos",
+    "reconcile": "No se pudo conciliar la partida"
+  }
+}

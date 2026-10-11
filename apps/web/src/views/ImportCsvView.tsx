@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { EmptyState } from "../components/EmptyState.js";
 import { api } from "../lib/api.js";
 import type { AccountRow } from "../lib/types.js";
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function ImportCsvView({ accounts, onImported }: Props) {
+  const { t } = useTranslation();
   const [csv, setCsv] = useState("");
   const [importJobId, setImportJobId] = useState<string | null>(null);
   const [rows, setRows] = useState<PreviewRow[]>([]);
@@ -161,8 +163,8 @@ export function ImportCsvView({ accounts, onImported }: Props) {
             </table>
           </div>
           {!canCommit && (
-            <EmptyState illustration="upload" title="Cuentas incompletas">
-              Crea cuentas de activo, gasto e ingreso antes de confirmar la importación.
+            <EmptyState illustration="upload" title={t("import.accountsIncompleteTitle")}>
+              {t("import.accountsIncomplete")}
             </EmptyState>
           )}
           <div className="field">

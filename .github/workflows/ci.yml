@@ -23,3 +23,21 @@ jobs:
       - run: pnpm build
       - run: pnpm typecheck
       - run: pnpm test
+
+  web-a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @finllm/web run generate:brand
+      - run: pnpm --filter @finllm/web build
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: pnpm --filter @finllm/web run test:e2e

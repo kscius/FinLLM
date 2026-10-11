@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@finllm/money": "workspace:*",
-    "drizzle-orm": "^0.38.3"
+    "drizzle-orm": "^0.45.4"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

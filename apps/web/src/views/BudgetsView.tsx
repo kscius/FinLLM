@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { EmptyState } from "../components/EmptyState.js";
 import { parseToMinor } from "@finllm/money";
 import { api } from "../lib/api.js";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function BudgetsView({ accounts }: Props) {
+  const { t } = useTranslation();
   const [list, setList] = useState<Budget[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -156,8 +158,8 @@ export function BudgetsView({ accounts }: Props) {
 
       {listLoading && <p className="muted" role="status">Cargando presupuestos…</p>}
       {!listLoading && list.length === 0 && (
-        <EmptyState illustration="chart" title="Sin presupuestos">
-          Define un periodo y montos por cuenta de gasto para hacer seguimiento.
+        <EmptyState illustration="chart" title={t("budgets.emptyTitle")}>
+          {t("budgets.emptyBody")}
         </EmptyState>
       )}
 

@@ -15,6 +15,18 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
+  /** When set, POST /api/v1/setup/initialize requires header X-Setup-Bootstrap with this value. */
+  SETUP_BOOTSTRAP_SECRET: z.string().min(32).optional(),
+  /** Unauthenticated GET /api/v1/setup/status when instance already has a user (prod default: false). */
+  ALLOW_PUBLIC_SETUP_STATUS: z
+    .string()
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  INVALIDATE_OTHER_SESSIONS_ON_LOGIN: z
+    .string()
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  MCP_TOKEN_DEFAULT_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(90),
   FINLLM_BOOK_CURRENCY: z.enum(["MXN", "USD"]).default("MXN"),
   FINLLM_TIMEZONE: z.string().default("America/Mexico_City"),
 });
@@ -27,8 +39,11 @@ export function loadConfig(): AppConfig {
     throw new Error(`Invalid environment: ${parsed.error.message}`);
   }
   const data = parsed.data;
+  const isProd = data.NODE_ENV === "production";
   return {
     ...data,
-    TRUST_PROXY: data.TRUST_PROXY || data.NODE_ENV === "production",
+    TRUST_PROXY: data.TRUST_PROXY || isProd,
+    ALLOW_PUBLIC_SETUP_STATUS: data.ALLOW_PUBLIC_SETUP_STATUS ?? !isProd,
+    INVALIDATE_OTHER_SESSIONS_ON_LOGIN: data.INVALIDATE_OTHER_SESSIONS_ON_LOGIN ?? isProd,
   };
 }

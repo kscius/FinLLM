@@ -1,20 +1,28 @@
 import type { AppView } from "./types.js";
 
-export const VIEW_META: Record<
-  AppView,
-  { slug: string; documentTitle: string; navLabel: string }
-> = {
-  overview: { slug: "resumen", documentTitle: "Resumen", navLabel: "Resumen" },
-  movements: { slug: "movimientos", documentTitle: "Movimientos", navLabel: "Movimientos" },
-  import: { slug: "importar", documentTitle: "Importar", navLabel: "Importar" },
-  budgets: { slug: "presupuestos", documentTitle: "Presupuestos", navLabel: "Presupuestos" },
-  investments: { slug: "inversiones", documentTitle: "Inversiones", navLabel: "Inversiones" },
-  reconciliation: { slug: "conciliacion", documentTitle: "Conciliación", navLabel: "Conciliación" },
+export const VIEW_META: Record<AppView, { slug: string; titleKey: string }> = {
+  overview: { slug: "overview", titleKey: "nav.overview" },
+  movements: { slug: "movements", titleKey: "nav.movements" },
+  import: { slug: "import", titleKey: "nav.import" },
+  budgets: { slug: "budgets", titleKey: "nav.budgets" },
+  investments: { slug: "investments", titleKey: "nav.investments" },
+  reconciliation: { slug: "reconciliation", titleKey: "nav.reconciliation" },
 };
 
-const SLUG_TO_VIEW = Object.fromEntries(
-  Object.entries(VIEW_META).map(([view, meta]) => [meta.slug, view as AppView]),
-) as Record<string, AppView>;
+/** Legacy Spanish hash slugs (backward compatible). */
+const LEGACY_SLUG_TO_VIEW: Record<string, AppView> = {
+  resumen: "overview",
+  movimientos: "movements",
+  importar: "import",
+  presupuestos: "budgets",
+  inversiones: "investments",
+  conciliacion: "reconciliation",
+};
+
+const SLUG_TO_VIEW = {
+  ...Object.fromEntries(Object.entries(VIEW_META).map(([view, meta]) => [meta.slug, view as AppView])),
+  ...LEGACY_SLUG_TO_VIEW,
+} as Record<string, AppView>;
 
 export function viewFromLocationHash(): AppView | null {
   const raw = window.location.hash.replace(/^#\/?/, "").split("/")[0]?.toLowerCase();

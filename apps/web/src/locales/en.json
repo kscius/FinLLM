@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "FinLLM",
+    "tagline": "Personal ledger",
+    "description": "FinLLM — self-hosted personal ledger: net worth, transactions, budgets, and CSV import."
+  },
+  "nav": {
+    "primary": "Main navigation",
+    "overview": "Overview",
+    "movements": "Transactions",
+    "import": "Import",
+    "budgets": "Budgets",
+    "investments": "Investments",
+    "reconciliation": "Reconciliation"
+  },
+  "common": {
+    "loading": "Loading…",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "skipToContent": "Skip to content",
+    "update": "Refresh",
+    "code": "Code",
+    "account": "Account",
+    "type": "Type",
+    "balance": "Balance",
+    "language": "Language"
+  },
+  "auth": {
+    "checking": "Checking instance…",
+    "loginHint": "Your personal ledger. Sign in with the email and password from initial setup.",
+    "initHint": "Self-hosted personal finance. Create the first owner account to initialize this instance.",
+    "passwordNew": "Password (min. 12 characters)",
+    "initialize": "Initialize instance",
+    "signIn": "Sign in",
+    "haveAccount": "I already have an account"
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "overview": {
+    "netWorth": "Net worth (MXN)",
+    "accounts": "Accounts",
+    "balancesCaption": "Balances by account",
+    "quickActions": "Quick actions",
+    "recordMovement": "Record transaction",
+    "importCsv": "Import CSV",
+    "reconcile": "Reconcile",
+    "emptyTitle": "No transactions yet",
+    "emptyBody": "Record an expense or income under Transactions, or import a CSV to see balances here.",
+    "chartNetWorth": "Net worth trend",
+    "chartExpenses": "Spending by category (last 30 days)",
+    "chartEmpty": "Not enough data for charts yet.",
+    "chartLoading": "Loading charts…"
+  },
+  "breakdown": {
+    "title": "Balance composition",
+    "assets": "Assets",
+    "liabilities": "Liabilities"
+  },
+  "movements": {
+    "intro": "Record an expense or income in MXN (double-entry applied automatically).",
+    "missingAccountsTitle": "Accounts required",
+    "missingAccounts": "Create at least one asset account and one {{kind}} account under «New account».",
+    "expenseKind": "expense",
+    "incomeKind": "income",
+    "expense": "Expense",
+    "income": "Income",
+    "typeGroup": "Transaction type"
+  },
+  "import": {
+    "accountsIncompleteTitle": "Accounts incomplete",
+    "accountsIncomplete": "Create asset, expense, and income accounts before confirming the import."
+  },
+  "budgets": {
+    "emptyTitle": "No budgets",
+    "emptyBody": "Set a period and amounts per expense account to track spending."
+  },
+  "investments": {
+    "intro": "Positions modeled as asset accounts in the ledger. Performance, lots, and IRR are not in this version; use the MCP harness for advanced operations.",
+    "emptyTitle": "No positions",
+    "emptyBody": "No asset accounts with balance. Create an ASSET account under Transactions."
+  },
+  "reconciliation": {
+    "intro": "Filter by statement period and mark items reconciled.",
+    "emptyTitle": "No items loaded",
+    "emptyBody": "Click «Load uncleared items» to search in the selected period.",
+    "reconciledSuccess": "Item marked reconciled."
+  },
+  "status": {
+    "view": "Current view: {{title}}"
+  },
+  "errors": {
+    "balances": "Could not load balances",
+    "reconcile": "Could not reconcile item"
+  }
+}

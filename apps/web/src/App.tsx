@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BalanceBreakdown } from "./components/BalanceBreakdown.js";
 import { BrandLockup } from "./components/BrandLockup.js";
 import { EmptyState } from "./components/EmptyState.js";
+import { LanguageToggle } from "./components/LanguageToggle.js";
 import { NavIcon } from "./components/NavIcon.js";
+import { OverviewCharts } from "./components/OverviewCharts.js";
 import { ThemeToggle } from "./components/ThemeToggle.js";
 import { api } from "./lib/api.js";
 import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
@@ -33,6 +36,7 @@ type UnclearedRow = {
 };
 
 export function App() {
+  const { t, i18n } = useTranslation();
   const [me, setMe] = useState<Me | null>(null);
   const [view, setView] = useState<AppView>("overview");
   const [balances, setBalances] = useState<BalancesResponse | null>(null);
@@ -58,8 +62,8 @@ export function App() {
   const navigateToView = useCallback((next: AppView) => {
     setView(next);
     setLocationHashForView(next);
-    setPageStatus(`Vista actual: ${VIEW_META[next].documentTitle}`);
-  }, []);
+    setPageStatus(t("status.view", { title: t(VIEW_META[next].titleKey) }));
+  }, [t]);
 
   const refreshMe = useCallback(async () => {
     try {
@@ -75,11 +79,13 @@ export function App() {
     try {
       setBalances(await api<BalancesResponse>("/api/v1/balances"));
     } catch (e) {
-      setBalancesError(e instanceof Error ? e.message : "No se pudieron cargar los saldos");
+      setBalancesError(e instanceof Error ? e.message : t("errors.balances"));
     } finally {
       setBalancesLoading(false);
     }
-  }, []);
+  }, [t]);
+
+  const viewTitle = t(VIEW_META[view].titleKey);
 
   useEffect(() => {
     let cancelled = false;
@@ -88,7 +94,8 @@ export function App() {
         const data = await api<{ initialized?: boolean }>("/api/v1/setup/status");
         if (!cancelled) setInstanceInitialized(Boolean(data.initialized));
       } catch {
-        if (!cancelled) setInstanceInitialized(null);
+        // Production hides setup status when already initialized (403).
+        if (!cancelled) setInstanceInitialized(true);
       }
       await refreshMe();
       if (!cancelled) setAuthBooting(false);
@@ -112,9 +119,9 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    document.title = `FinLLM — ${VIEW_META[view].documentTitle}`;
+    document.title = `${t("app.name")} — ${viewTitle}`;
     viewTitleRef.current?.focus();
-  }, [view]);
+  }, [view, viewTitle, t, i18n.language]);
 
   useEffect(() => {
     if (me?.user) loadBalances();
@@ -203,12 +210,12 @@ export function App() {
         method: "PATCH",
         body: JSON.stringify({ state: "RECONCILED" }),
       });
-      setReconcileFeedback({ text: "Partida marcada como conciliada.", kind: "success" });
+      setReconcileFeedback({ text: t("reconciliation.reconciledSuccess"), kind: "success" });
       await loadUncleared();
       await loadBalances();
     } catch (e) {
       setReconcileFeedback({
-        text: e instanceof Error ? e.message : "No se pudo conciliar la partida",
+        text: e instanceof Error ? e.message : t("errors.reconcile"),
         kind: "error",
       });
     } finally {
@@ -236,20 +243,19 @@ export function App() {
       return (
         <div className="auth-wrap">
           <main className="card auth-card auth-loading" aria-busy="true">
-            <p className="muted">Comprobando instancia…</p>
+            <p className="muted">{t("auth.checking")}</p>
           </main>
         </div>
       );
     }
     return (
       <div className="auth-wrap">
-        <a className="skip-link" href="#auth-main">Ir al contenido</a>
+        <a className="skip-link" href="#auth-main">{t("common.skipToContent")}</a>
         <main id="auth-main" className="card auth-card">
-          <BrandLockup as="h1" subtitle="Libro contable personal" />
+          <LanguageToggle />
+          <BrandLockup as="h1" subtitle />
           <p className="muted">
-            {instanceInitialized
-              ? "Tu libro contable personal. Inicia sesión con el correo y la contraseña de la configuración inicial."
-              : "Finanzas personales autoalojadas. Crea la primera cuenta de propietario para inicializar esta instancia."}
+            {instanceInitialized ? t("auth.loginHint") : t("auth.initHint")}
           </p>
           <form
             onSubmit={(e) => {
@@ -259,7 +265,7 @@ export function App() {
             }}
           >
             <div className="field">
-              <label htmlFor="auth-email">Correo</label>
+              <label htmlFor="auth-email">{t("common.email")}</label>
               <input
                 id="auth-email"
                 value={email}
@@ -271,7 +277,7 @@ export function App() {
             </div>
             <div className="field">
               <label htmlFor="auth-password">
-                {instanceInitialized ? "Contraseña" : "Contraseña (mín. 12 caracteres)"}
+                {instanceInitialized ? t("common.password") : t("auth.passwordNew")}
               </label>
               <input
                 id="auth-password"
@@ -286,17 +292,17 @@ export function App() {
             <div className="toolbar">
               {!instanceInitialized && (
                 <button type="submit" className="btn">
-                  Inicializar instancia
+                  {t("auth.initialize")}
                 </button>
               )}
               {instanceInitialized && (
                 <button type="submit" className="btn">
-                  Iniciar sesión
+                  {t("auth.signIn")}
                 </button>
               )}
               {!instanceInitialized && (
                 <button type="button" className="btn btn-ghost" onClick={() => login()}>
-                  Ya tengo cuenta
+                  {t("auth.haveAccount")}
                 </button>
               )}
             </div>
@@ -318,10 +324,10 @@ export function App() {
 
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#app-main">Ir al contenido</a>
+      <a className="skip-link" href="#app-main">{t("common.skipToContent")}</a>
       <header className="app-header">
         <BrandLockup as="h1" compact />
-        <nav className="app-nav" aria-label="Principal">
+        <nav className="app-nav" aria-label={t("nav.primary")}>
           {(Object.keys(VIEW_META) as AppView[]).map((key) => (
             <button
               key={key}
@@ -331,15 +337,16 @@ export function App() {
               onClick={() => navigateToView(key)}
             >
               <NavIcon view={key} />
-              <span>{VIEW_META[key].navLabel}</span>
+              <span>{t(VIEW_META[key].titleKey)}</span>
             </button>
           ))}
         </nav>
         <div className="header-meta">
+          <LanguageToggle />
           <ThemeToggle />
           <span className="header-email" title={me.user.email}>{me.user.email}</span>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => logout()}>
-            Salir
+            {t("common.logout")}
           </button>
         </div>
       </header>
@@ -347,14 +354,14 @@ export function App() {
       <main id="app-main" className="app-main">
         <p className="sr-only live-status" aria-live="polite" aria-atomic="true">{pageStatus}</p>
         <h2 ref={viewTitleRef} tabIndex={-1} className="view-title" id="view-title">
-          {VIEW_META[view].documentTitle}
+          {viewTitle}
         </h2>
         {view === "overview" && (
           <>
             <section className="card hero-patrimonio" aria-labelledby="patrimonio-heading">
-              <h2 className="label" id="patrimonio-heading">Patrimonio neto (MXN)</h2>
+              <h2 className="label" id="patrimonio-heading">{t("overview.netWorth")}</h2>
               <p className="amount" aria-live="polite">
-                {balancesLoading ? "Cargando…" : netWorthDisplay}
+                {balancesLoading ? t("common.loading") : netWorthDisplay}
               </p>
               {balancesError && (
                 <p className="alert" role="alert">{balancesError}</p>
@@ -363,39 +370,40 @@ export function App() {
                 <BalanceBreakdown rows={balances.balances} />
               )}
             </section>
-            <div className="quick-actions" role="navigation" aria-label="Acciones rápidas">
+            <OverviewCharts />
+            <div className="quick-actions" role="navigation" aria-label={t("overview.quickActions")}>
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("movements")}>
-                Registrar movimiento
+                {t("overview.recordMovement")}
               </button>
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("import")}>
-                Importar CSV
+                {t("overview.importCsv")}
               </button>
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("reconciliation")}>
-                Conciliar
+                {t("overview.reconcile")}
               </button>
             </div>
             <section className="card" aria-labelledby="cuentas-heading">
               <div className="toolbar">
-                <h2 id="cuentas-heading" style={{ margin: 0, flex: 1 }}>Cuentas</h2>
+                <h2 id="cuentas-heading" style={{ margin: 0, flex: 1 }}>{t("overview.accounts")}</h2>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => loadBalances()} disabled={balancesLoading}>
-                  Actualizar
+                  {t("common.update")}
                 </button>
               </div>
               {!balancesLoading && balances && balances.balances.length === 0 && (
-                <EmptyState title="Sin movimientos aún" illustration="ledger">
-                  Registra un gasto o ingreso en Movimientos, o importa un CSV para ver saldos aquí.
+                <EmptyState title={t("overview.emptyTitle")} illustration="ledger">
+                  {t("overview.emptyBody")}
                 </EmptyState>
               )}
               {balances && balances.balances.length > 0 && (
                 <div className="table-wrap">
                   <table className="data-table">
-                    <caption className="sr-only">Saldos por cuenta</caption>
+                    <caption className="sr-only">{t("overview.balancesCaption")}</caption>
                     <thead>
                       <tr>
-                        <th scope="col">Código</th>
-                        <th scope="col">Cuenta</th>
-                        <th scope="col">Tipo</th>
-                        <th scope="col" className="amount-cell">Saldo</th>
+                        <th scope="col">{t("common.code")}</th>
+                        <th scope="col">{t("common.account")}</th>
+                        <th scope="col">{t("common.type")}</th>
+                        <th scope="col" className="amount-cell">{t("common.balance")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -443,7 +451,7 @@ export function App() {
 
         {view === "reconciliation" && (
             <section className="card" aria-labelledby="view-title">
-            <p className="muted">Filtra por periodo del estado de cuenta y marca partidas conciliadas.</p>
+            <p className="muted">{t("reconciliation.intro")}</p>
             {reconcileFeedback && (
               <p
                 className={`status-banner ${reconcileFeedback.kind === "success" ? "status-banner--success" : "status-banner--error"}`}
@@ -496,8 +504,8 @@ export function App() {
               </button>
             )}
             {uncleared.length === 0 && reconcileAccountId && !reconcileLoading && (
-              <EmptyState illustration="reconcile" title="Sin partidas cargadas">
-                Pulsa «Ver movimientos sin conciliar» para buscar en el periodo seleccionado.
+              <EmptyState illustration="reconcile" title={t("reconciliation.emptyTitle")}>
+                {t("reconciliation.emptyBody")}
               </EmptyState>
             )}
             {uncleared.length > 0 && (

@@ -7,18 +7,28 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "generate:brand": "node scripts/generate-brand-assets.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@finllm/money": "workspace:*",
+    "i18next": "^25.5.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-i18next": "^15.7.3",
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.55.0",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "sharp": "^0.34.3",
     "typescript": "^5.7.2",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "vite-plugin-pwa": "^0.21.2"
   }
 }
