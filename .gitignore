@@ -3,6 +3,7 @@ dist/
 build/
 .env
 .env.local
+.mcp.json
 *.log
 .DS_Store
 coverage/
@@ -11,3 +12,4 @@ coverage/
 /drizzle/
 *.tsbuildinfo
 postgres-data/
+.cursor/plans/

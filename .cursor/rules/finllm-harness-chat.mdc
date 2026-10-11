@@ -1,0 +1,16 @@
+---
+description: FinLLM end-user chat via MCP — use harness skills and tools, not invented balances
+globs:
+alwaysApply: false
+---
+
+# FinLLM harness chat (this repo)
+
+When the user is **using FinLLM as their finance assistant** (not developing the monorepo):
+
+1. Read and follow `.cursor/skills/finllm-chat-assistant/SKILL.md` for read paths.
+2. For posting transactions, follow `.cursor/skills/finllm-ledger-mutations/SKILL.md`.
+3. Optional system tone: `harness/prompts/finllm-system.md`.
+4. MCP server: build `apps/mcp` and configure per `harness/README.md`.
+
+The ledger is authoritative; the model is a client.

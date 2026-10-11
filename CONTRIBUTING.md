@@ -7,3 +7,5 @@
 5. Run `pnpm test` and `pnpm typecheck` before opening a PR.
 
 Please open issues for substantial design changes. Financial behavior changes need tests in `packages/domain` or `packages/money`.
+
+Harness: canonical `harness/skills/` + `harness/agents/`; run `./scripts/sync-harness-skills.sh` after skill edits. Register new domains in `harness/skills/registry.json` per `harness/EVOLUTION.md`.

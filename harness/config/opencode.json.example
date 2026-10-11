@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.schema.json",
+  "mcp": {
+    "finllm": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/FinLLM/apps/mcp/dist/index.js"],
+      "env": {
+        "MCP_API_URL": "http://localhost:3001",
+        "FINLLM_MCP_TOKEN": "REPLACE_WITH_TOKEN_FROM_API"
+      }
+    }
+  },
+  "instructions": [
+    "Read harness/prompts/finllm-system.md",
+    "Apply harness/skills/finllm-chat-assistant and finllm-ledger-mutations for finance questions"
+  ]
+}

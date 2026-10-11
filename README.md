@@ -22,11 +22,18 @@ pnpm dev
 
 Initialize the instance from the web UI (first user), then create accounts and post transactions via REST or the dashboard.
 
+## Chat harness (LLM + MCP)
+
+Talk to **your** FinLLM from Cursor, Claude Code, Codex, OpenCode, or Claude Desktop: connect the MCP server, load the bundled **skills**, and chat in the harness UI.
+
+- [Harness guide](harness/README.md) — skills, system prompt, config examples  
+- [MCP setup](docs/mcp-setup.md) — tokens, tools, build  
+- [AGENTS.md](AGENTS.md) — instructions for agents **developing** this repo  
+
 ## Architecture
 
 - [Architecture overview](docs/architecture.md)
 - [Calculation methodology](docs/calculations.md)
-- [MCP setup](docs/mcp-setup.md)
 
 ## Development
 

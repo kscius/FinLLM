@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "updated": "2026-10-11",
+  "policy": "Canonical skills live under harness/skills/. Run scripts/sync-harness-skills.sh to mirror into .cursor/skills/. Add or bump maturity when product or MCP surface changes; see harness/EVOLUTION.md.",
+  "maturity": {
+    "active": "MCP/API support exists; skill is maintained with product",
+    "seed": "Guidance only; partial API or web-only paths",
+    "planned": "Document boundaries until FEATURE_STATUS ships"
+  },
+  "skills": [
+    {
+      "id": "finllm-skill-router",
+      "domain": "meta",
+      "maturity": "active",
+      "triggers": ["any FinLLM chat", "which skill", "finanzas"],
+      "mcp_tools": []
+    },
+    {
+      "id": "finllm-chat-assistant",
+      "domain": "general",
+      "maturity": "active",
+      "triggers": ["cuentas", "saldos", "dashboard", "overview"],
+      "mcp_tools": ["list_accounts", "get_balances", "list_transactions"]
+    },
+    {
+      "id": "finllm-ledger-mutations",
+      "domain": "posting",
+      "maturity": "active",
+      "triggers": ["registrar", "post", "asiento", "commit"],
+      "mcp_tools": ["preview_post_transaction", "commit_post_transaction"]
+    },
+    {
+      "id": "finllm-net-worth-balances",
+      "domain": "net_worth",
+      "maturity": "active",
+      "triggers": ["patrimonio", "net worth", "cuánto tengo", "balance"],
+      "mcp_tools": ["get_balances"]
+    },
+    {
+      "id": "finllm-accounts-chart",
+      "domain": "chart_of_accounts",
+      "maturity": "active",
+      "triggers": ["cuentas contables", "chart of accounts", "tipo de cuenta"],
+      "mcp_tools": ["list_accounts"]
+    },
+    {
+      "id": "finllm-transfers",
+      "domain": "transfers",
+      "maturity": "seed",
+      "triggers": ["transferencia", "entre cuentas", "mover dinero"],
+      "mcp_tools": ["preview_post_transaction", "commit_post_transaction", "list_accounts"]
+    },
+    {
+      "id": "finllm-multi-currency-fx",
+      "domain": "fx",
+      "maturity": "seed",
+      "triggers": ["USD", "MXN", "tipo de cambio", "divisa"],
+      "mcp_tools": ["list_accounts", "get_balances"]
+    },
+    {
+      "id": "finllm-budgets",
+      "domain": "budgets",
+      "maturity": "seed",
+      "triggers": ["presupuesto", "budget", "límite de gasto"],
+      "mcp_tools": ["get_balances", "list_transactions"],
+      "product_note": "Budget CRUD via REST/web; MCP budget tools planned"
+    },
+    {
+      "id": "finllm-reconciliation",
+      "domain": "reconciliation",
+      "maturity": "active",
+      "triggers": ["conciliar", "reconcile", "uncleared", "banco"],
+      "mcp_tools": ["list_transactions", "list_accounts"]
+    },
+    {
+      "id": "finllm-csv-import",
+      "domain": "import",
+      "maturity": "seed",
+      "triggers": ["CSV", "importar", "extracto"],
+      "mcp_tools": [],
+      "product_note": "Deterministic import via API/web; no LLM parse path"
+    },
+    {
+      "id": "finllm-cashflow-spending",
+      "domain": "cashflow",
+      "maturity": "seed",
+      "triggers": ["gastos", "spending", "flujo", "categoría"],
+      "mcp_tools": ["list_transactions", "get_balances"]
+    },
+    {
+      "id": "finllm-investments",
+      "domain": "investments",
+      "maturity": "planned",
+      "triggers": ["inversión", "portafolio", "acciones", "ETF"],
+      "mcp_tools": ["list_accounts", "get_balances"]
+    },
+    {
+      "id": "finllm-taxes-advisory",
+      "domain": "taxes",
+      "maturity": "planned",
+      "triggers": ["impuestos", "ISR", "deducción", "SAT"],
+      "mcp_tools": []
+    }
+  ],
+  "agents": [
+    {
+      "id": "finllm-orchestrator",
+      "file": "harness/agents/finllm-orchestrator.md",
+      "routes_to_skills": ["finllm-skill-router", "finllm-chat-assistant"]
+    },
+    {
+      "id": "finllm-budget-specialist",
+      "file": "harness/agents/finllm-budget-specialist.md",
+      "skills": ["finllm-budgets", "finllm-cashflow-spending"]
+    },
+    {
+      "id": "finllm-reconciliation-specialist",
+      "file": "harness/agents/finllm-reconciliation-specialist.md",
+      "skills": ["finllm-reconciliation"]
+    },
+    {
+      "id": "finllm-import-specialist",
+      "file": "harness/agents/finllm-import-specialist.md",
+      "skills": ["finllm-csv-import"]
+    },
+    {
+      "id": "finllm-investment-analyst",
+      "file": "harness/agents/finllm-investment-analyst.md",
+      "skills": ["finllm-investments"],
+      "maturity": "planned"
+    }
+  ]
+}

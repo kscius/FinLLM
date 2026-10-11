@@ -1,12 +1,24 @@
 # MCP client setup
 
+FinLLM exposes a **stdio MCP server** (`apps/mcp`) that proxies to the REST API. End users normally reach it through a **chat harness** (Cursor, Claude Code, Codex, OpenCode, Claude Desktop). See **[harness/README.md](../harness/README.md)** for skills, system prompt, and per-tool config examples.
+
+## Build
+
+```bash
+pnpm --filter @finllm/mcp run build
+```
+
 ## Generate a token
 
 1. Sign in to the FinLLM web UI or API.
-2. `POST /api/v1/mcp/tokens` with body `{ "name": "cursor", "scopes": ["ledger.read"] }`.
-3. Store the returned token securely.
+2. `POST /api/v1/mcp/tokens` with body, for example:
+   - Read only: `{ "name": "cursor-read", "scopes": ["ledger.read"] }`
+   - Read + post with confirm: `{ "name": "cursor-write", "scopes": ["ledger.read", "ledger.write"] }`
+3. Store the returned token securely; set `FINLLM_MCP_TOKEN` in your harness MCP env.
 
 ## Cursor / Claude Desktop (stdio)
+
+Example (also in `harness/config/cursor-mcp.json.example`):
 
 ```json
 {
@@ -23,12 +35,22 @@
 }
 ```
 
-Build the MCP app first: `pnpm --filter @finllm/mcp run build`.
+**Claude Code:** copy [`.mcp.json.example`](../.mcp.json.example) → `.mcp.json` in the repo root (do not commit tokens).
 
 ## Available tools (MVP)
 
-- `list_accounts` — read-only
-- `get_balances` — read-only
-- `search_transactions` — placeholder (balances snapshot)
+| Tool | Scope | Description |
+| ---- | ----- | ----------- |
+| `list_accounts` | read | Accounts in the authenticated book |
+| `get_balances` | read | Balances and net worth |
+| `list_transactions` | read | Splits; optional `accountId`, `reconcileState`, `limit` |
+| `preview_post_transaction` | write (preview) | Returns `confirmId` for a balanced transaction |
+| `commit_post_transaction` | write | Commits preview using `confirmId` |
 
-Mutating tools require server-side confirmation tokens (see API `/api/v1/confirm/preview`).
+Mutations use server-side confirm tokens (`POST /api/v1/confirm/preview` and `/commit`). The harness should load skills **`finllm-chat-assistant`** and **`finllm-ledger-mutations`** (see `harness/skills/`).
+
+## Threat model (summary)
+
+- Treat MCP tokens like API keys; scope read vs write.
+- The model must not be trusted to compute balances; always use tool output.
+- See [SECURITY.md](../SECURITY.md).

@@ -17,3 +17,6 @@
 | Automated tests | Partial | Money + ledger + CSV import unit tests |
 | Bank aggregators | Unsupported | Manual import only |
 | Built-in external AI | Disabled | `AI_FEATURES_ENABLED=false` |
+| Harness skills + MCP configs | Implemented | `harness/`, `registry.json`, domain skills, `sync-harness-skills.sh` |
+| Harness agents (templates) | Implemented | `harness/agents/` — orchestrator + domain specialists |
+| Harness evolution process | Implemented | `harness/EVOLUTION.md`, `feedback/skill-proposal.md` |

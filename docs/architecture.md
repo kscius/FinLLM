@@ -11,7 +11,7 @@ FinLLM is a **modular monolith**: deterministic ledger services are the system o
 | `@finllm/db` | Drizzle schema + PostgreSQL migrations |
 | `@finllm/api` | Fastify REST API, sessions, imports, audit |
 | `@finllm/web` | React dashboard (works without an LLM) |
-| `@finllm/mcp` | MCP stdio server (read tools in MVP) |
+| `@finllm/mcp` | MCP stdio server (read + confirm-gated writes) |
 
 ## Principles
 
