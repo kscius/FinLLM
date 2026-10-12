@@ -126,6 +126,7 @@ export async function getAccountBalances(db: Db, bookId: string) {
       name: accounts.name,
       code: accounts.code,
       includeInNetWorth: accounts.includeInNetWorth,
+      subtype: accounts.subtype,
       debitSum: sql<bigint>`coalesce(sum(${splits.debitMinor}), 0)`,
       creditSum: sql<bigint>`coalesce(sum(${splits.creditMinor}), 0)`,
     })
@@ -140,6 +141,7 @@ export async function getAccountBalances(db: Db, bookId: string) {
       accounts.name,
       accounts.code,
       accounts.includeInNetWorth,
+      accounts.subtype,
     );
 
   return rows.map((r) => ({
@@ -154,6 +156,7 @@ export async function getAccountBalances(db: Db, bookId: string) {
       BigInt(r.creditSum),
     ).toString(),
     includeInNetWorth: r.includeInNetWorth,
+    subtype: r.subtype,
   }));
 }
 

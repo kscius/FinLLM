@@ -1,5 +1,7 @@
 # FinLLM domain skills
 
+Skills teach harness models **how** to call FinLLM safely; product behavior is defined by the API and [FEATURE_STATUS.md](../../docs/FEATURE_STATUS.md). Repo mission: [README.md](../../README.md).
+
 Catálogo maestro: [`registry.json`](registry.json) (maturity, triggers, MCP tools).
 
 ## Siempre cargar en el harness

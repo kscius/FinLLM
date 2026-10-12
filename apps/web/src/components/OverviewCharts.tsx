@@ -28,6 +28,8 @@ function minorToDisplay(minor: string): number {
 export function OverviewCharts() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [netSeries, setNetSeries] = useState<NetWorthPoint[]>([]);
   const [expenses, setExpenses] = useState<ExpenseRow[]>([]);
 
@@ -35,6 +37,7 @@ export function OverviewCharts() {
     let cancelled = false;
     (async () => {
       setLoading(true);
+      setLoadError(false);
       try {
         const [nw, exp] = await Promise.all([
           api<{ points: NetWorthPoint[] }>("/api/v1/analytics/net-worth-series"),
@@ -48,6 +51,7 @@ export function OverviewCharts() {
         if (!cancelled) {
           setNetSeries([]);
           setExpenses([]);
+          setLoadError(true);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -56,7 +60,7 @@ export function OverviewCharts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   const lineData = useMemo(
     () =>
@@ -81,6 +85,17 @@ export function OverviewCharts() {
 
   if (loading) {
     return <p className="muted chart-panel" role="status">{t("overview.chartLoading")}</p>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="card chart-panel chart-error" role="alert">
+        <p className="muted">{t("overview.chartError")}</p>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setReloadKey((k) => k + 1)}>
+          {t("overview.chartRetry")}
+        </button>
+      </div>
+    );
   }
 
   if (lineData.length === 0 && barData.length === 0) {

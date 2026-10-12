@@ -2,6 +2,8 @@
 
 FinLLM exposes a **stdio MCP server** (`apps/mcp`) that proxies to the REST API. End users normally reach it through a **chat harness** (Cursor, Claude Code, Codex, OpenCode, Claude Desktop). See **[harness/README.md](../harness/README.md)** for skills, system prompt, and per-tool config examples.
 
+**Prerequisites:** A running API (local or [deployment](deployment.md)), instance initialized, and a user-created MCP token. The web dashboard covers flows that MCP does not expose yet (CSV import UI, budget CRUD, reconciliation marks) — see [FEATURE_STATUS.md](FEATURE_STATUS.md).
+
 ## Build
 
 ```bash

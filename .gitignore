@@ -15,4 +15,4 @@ postgres-data/
 .cursor/plans/
 
 # Local server only (Traefik / Cloudflare host) — never commit
-/deploy/local-server/
+/deploy/

@@ -16,3 +16,11 @@ export function accountTypeLabel(type: string): string {
   }
   return type;
 }
+
+export function accountSubtypeLabel(subtype: string): string {
+  const key = `accountSubtypes.${subtype}`;
+  if (i18n.isInitialized && i18n.exists(key)) {
+    return i18n.t(key);
+  }
+  return subtype;
+}

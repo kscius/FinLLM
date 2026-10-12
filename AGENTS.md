@@ -8,6 +8,7 @@ This file is for **agents that edit this repository** (Cursor, Claude Code, Code
 - **FinLLM** is the system of record: PostgreSQL ledger, REST API, web UI, MCP server (`apps/mcp`).
 - **LLMs are clients**, not accountants. All balances, FX, and double-entry rules live in `@finllm/domain` and `@finllm/money`.
 - Never use floating-point for money in application code; use bigint minor units.
+- **Mission / philosophy** for humans: [README.md](README.md). **Architecture depth**: [docs/architecture.md](docs/architecture.md).
 
 ## Monorepo map
 
@@ -19,6 +20,9 @@ This file is for **agents that edit this repository** (Cursor, Claude Code, Code
 | `packages/db` | Drizzle schema + `drizzle/` migrations |
 | `packages/domain` | Ledger validation |
 | `packages/money` | Parsing, FX helpers |
+| `harness/` | End-user skills, agents, prompts (canonical) |
+| `deploy/traefik-example/` | Committed production Compose reference |
+| `docs/` | [Doc index](docs/README.md) |
 
 ## Commands (from repo root)
 
@@ -38,6 +42,7 @@ Postgres: `docker compose up postgres -d` with `DATABASE_URL` from `.env.example
 - MCP tools must call the API; do not bypass confirm flow for mutations.
 - Update `docs/FEATURE_STATUS.md` when shipping user-visible behavior.
 - Harness: `harness/skills/` (canonical), `harness/agents/`, `registry.json`; sync via `./scripts/sync-harness-skills.sh` → `.cursor/skills/`. See `harness/EVOLUTION.md`.
+- Deployment docs: `docs/deployment.md`; do not commit `deploy/local-server/` (gitignored).
 
 ## Security
 

@@ -1,5 +1,7 @@
 # Feature status
 
+Living matrix for **0.1.0 MVP**. Product mission and doc map: [README](../README.md), [docs/README.md](README.md).
+
 | Area | Status | Notes |
 | ---- | ------ | ----- |
 | Auth / single-user setup | Implemented | `/api/v1/setup/initialize`, `/api/v1/setup/status`; web hides init when already set up |
@@ -11,12 +13,12 @@
 | Reconciliation UI | Implemented | Web uncleared list + date filter + mark reconciled |
 | Web UX / design system | Implemented | i18n en/es (default en, localStorage), gráficos Recharts, PWA, OG/PNG, marca SVG, hash routes (EN + slugs ES legacy), tema, axe Playwright en CI |
 | Web analytics API | Implemented | `GET /api/v1/analytics/net-worth-series`, `expenses-by-category` |
-| Investments | Partial | Web vista de activos; analytics/lotes Phase 4+ |
+| Investments | Partial | Web portafolio (filtros BANK/cash, KPIs, donut, nav móvil); analytics/lotes Phase 4+ |
 | Web — movements / CSV | Implemented | Gasto/ingreso, import preview+commit, crear cuentas |
 | MCP read tools | Implemented | list_accounts, get_balances, list_transactions |
 | MCP mutations | Implemented | preview_post_transaction + commit_post_transaction (confirm flow) |
 | Security hardening | Implemented | CSP (nginx), Drizzle CVE patch, confirm-only txn writes, MCP token TTL/revoke, setup bootstrap |
-| Docker Compose | Implemented | postgres + api + web |
+| Docker Compose | Implemented | Root `docker-compose.yml` (postgres + api + web); prod reference `deploy/traefik-example/` — [deployment.md](deployment.md) |
 | Backup / restore | Implemented | `scripts/backup-db.sh`, `restore-db.sh`, `verify-backup-restore.sh` (Docker pg fallback) |
 | Automated tests | Partial | Money + ledger + CSV import unit tests |
 | Bank aggregators | Unsupported | Manual import only |

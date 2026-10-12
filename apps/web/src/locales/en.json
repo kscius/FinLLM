@@ -5,6 +5,7 @@
     "description": "FinLLM — self-hosted personal ledger: net worth, transactions, budgets, and CSV import."
   },
   "nav": {
+    "mobile": "Quick navigation",
     "primary": "Main navigation",
     "overview": "Overview",
     "movements": "Transactions",
@@ -44,6 +45,14 @@
     "INCOME": "Income",
     "EXPENSE": "Expense"
   },
+  "accountSubtypes": {
+    "CASH": "Cash & wallet",
+    "BANK": "Bank / brokerage",
+    "CREDIT_CARD": "Credit card",
+    "LOAN": "Loan",
+    "INCOME_GENERIC": "Income category",
+    "EXPENSE_GENERIC": "Expense category"
+  },
   "auth": {
     "checking": "Checking instance…",
     "loginHint": "Your personal ledger. Sign in with the email and password from initial setup.",
@@ -73,7 +82,9 @@
     "chartNetWorth": "Net worth trend",
     "chartExpenses": "Spending by category (last 30 days)",
     "chartEmpty": "Not enough data for charts yet.",
-    "chartLoading": "Loading charts…"
+    "chartLoading": "Loading charts…",
+    "chartError": "Could not load analytics.",
+    "chartRetry": "Try again"
   },
   "breakdown": {
     "title": "Balance composition",
@@ -100,6 +111,8 @@
     "accountCreatedSuccess": "Account created.",
     "newAccountSummary": "New account",
     "createAccount": "Create account",
+    "assetSubtype": "Asset kind",
+    "assetSubtypeHint": "Use Bank / brokerage for investment accounts shown under Investments.",
     "errors": {
       "post": "Could not post transaction",
       "createAccount": "Could not create account"
@@ -160,10 +173,29 @@
     }
   },
   "investments": {
-    "intro": "Positions modeled as asset accounts in the ledger. Performance, lots, and IRR are not in this version; use the MCP harness for advanced operations.",
-    "emptyTitle": "No positions",
-    "emptyBody": "No asset accounts with balance. Create an ASSET account under Transactions.",
-    "positionsCaption": "Investment positions by account"
+    "heroTitle": "Portfolio",
+    "intro": "Holdings are ledger asset accounts. Advanced performance, lots, and IRR live in the MCP harness.",
+    "footnote": "Performance and tax lots are not calculated in this view — balances reflect posted ledger entries only.",
+    "segmentLabel": "Portfolio filter",
+    "segmentHoldings": "Holdings",
+    "segmentCash": "Cash",
+    "segmentAll": "All assets",
+    "segmentEmptyTitle": "Nothing in this filter",
+    "segmentEmptyBody": "No {{segment}} with a balance yet. Try another filter or post a transaction.",
+    "emptyTitle": "No asset balances yet",
+    "emptyBody": "Create a bank or brokerage account and record a deposit to see your portfolio here.",
+    "createHoldingCta": "Add account in Transactions",
+    "kpiGroup": "Portfolio summary",
+    "totalValue": "Total value",
+    "positionCount": "{{count}} positions",
+    "largestHolding": "Largest position",
+    "topAllocation": "Top allocation",
+    "allocationTitle": "Allocation",
+    "positionsTitle": "Positions",
+    "positionsCaption": "Investment positions by account",
+    "subtypeColumn": "Kind",
+    "shareColumn": "Share",
+    "ofPortfolio": "of filter total"
   },
   "reconciliation": {
     "intro": "Filter by statement period and mark items reconciled.",

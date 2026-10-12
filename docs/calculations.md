@@ -1,5 +1,7 @@
 # Financial calculation methodology (MVP)
 
+Authoritative rules live in `@finllm/money` and `@finllm/domain`; the API applies them on every read/write. LLM clients must not reimplement this logic — use tool and API outputs only. See [architecture.md](architecture.md).
+
 ## Money representation
 
 - Storage: `bigint` minor units (centavos for MXN, cents for USD).

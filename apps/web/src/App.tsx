@@ -6,6 +6,7 @@ import { EmptyState } from "./components/EmptyState.js";
 import { LanguageToggle } from "./components/LanguageToggle.js";
 import { NavIcon } from "./components/NavIcon.js";
 import { OverviewCharts } from "./components/OverviewCharts.js";
+import { MobileNav } from "./components/MobileNav.js";
 import { ThemeToggle } from "./components/ThemeToggle.js";
 import { api } from "./lib/api.js";
 import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
@@ -446,7 +447,11 @@ export function App() {
         )}
         {view === "budgets" && <BudgetsView accounts={allAccounts} />}
         {view === "investments" && (
-          <InvestmentsView balances={balances?.balances ?? null} balancesLoading={balancesLoading} />
+          <InvestmentsView
+            balances={balances?.balances ?? null}
+            balancesLoading={balancesLoading}
+            onCreateHolding={() => navigateToView("movements")}
+          />
         )}
 
         {view === "reconciliation" && (
@@ -546,6 +551,7 @@ export function App() {
           </section>
         )}
       </main>
+      <MobileNav view={view} onNavigate={navigateToView} />
     </div>
   );
 }

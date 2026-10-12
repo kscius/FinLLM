@@ -1,5 +1,7 @@
 # FinLLM harness agents (plantillas)
 
+Agents are **optional role templates** for chat harnesses; they route to skills in [`../skills/`](../skills/). Not part of the runtime server — see [harness/README.md](../README.md).
+
 Archivos en este directorio son **roles** para el chat del harness. Cópialos a:
 
 - **Cursor:** `~/.cursor/agents/` o `.cursor/agents/` del proyecto

@@ -37,6 +37,8 @@ No edites `.cursor/skills/finllm-*` a mano salvo emergencia; vuelve a sincroniza
 
 ## Roadmap de dominios (referencia)
 
-- **Activo hoy:** cuentas, saldos/patrimonio, transacciones, conciliación (lectura), asientos con confirmación, harness meta-router.
-- **Seed:** presupuestos, import CSV (vía web/API), transferencias, FX, cashflow agregado.
-- **Planned:** inversiones, impuestos (solo límites y disclaimers hasta módulo producto).
+Alineado con [`skills/registry.json`](skills/registry.json) (oct 2026):
+
+- **active:** `finllm-skill-router`, `finllm-chat-assistant`, `finllm-ledger-mutations`, `finllm-net-worth-balances`, `finllm-accounts-chart`, `finllm-reconciliation`
+- **seed:** `finllm-transfers`, `finllm-multi-currency-fx`, `finllm-budgets`, `finllm-csv-import`, `finllm-cashflow-spending` (API/web soportan parte del flujo; MCP sin tools dedicadas aún)
+- **planned:** `finllm-investments`, `finllm-taxes-advisory` (disclaimers; sin asesoría legal en el producto)

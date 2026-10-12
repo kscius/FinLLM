@@ -5,6 +5,7 @@
     "description": "FinLLM — libro contable personal autoalojado: patrimonio, movimientos, presupuestos e importación CSV."
   },
   "nav": {
+    "mobile": "Navegación rápida",
     "primary": "Navegación principal",
     "overview": "Resumen",
     "movements": "Movimientos",
@@ -44,6 +45,14 @@
     "INCOME": "Ingreso",
     "EXPENSE": "Gasto"
   },
+  "accountSubtypes": {
+    "CASH": "Efectivo y monedero",
+    "BANK": "Banco / casa de bolsa",
+    "CREDIT_CARD": "Tarjeta de crédito",
+    "LOAN": "Préstamo",
+    "INCOME_GENERIC": "Categoría de ingreso",
+    "EXPENSE_GENERIC": "Categoría de gasto"
+  },
   "auth": {
     "checking": "Comprobando instancia…",
     "loginHint": "Tu libro contable personal. Inicia sesión con el correo y la contraseña de la configuración inicial.",
@@ -73,7 +82,9 @@
     "chartNetWorth": "Tendencia de patrimonio",
     "chartExpenses": "Gastos por categoría (últimos 30 días)",
     "chartEmpty": "Aún no hay datos suficientes para gráficos.",
-    "chartLoading": "Cargando gráficos…"
+    "chartLoading": "Cargando gráficos…",
+    "chartError": "No se pudieron cargar los análisis.",
+    "chartRetry": "Reintentar"
   },
   "breakdown": {
     "title": "Composición del balance",
@@ -100,6 +111,8 @@
     "accountCreatedSuccess": "Cuenta creada.",
     "newAccountSummary": "Nueva cuenta",
     "createAccount": "Crear cuenta",
+    "assetSubtype": "Tipo de activo",
+    "assetSubtypeHint": "Usa Banco / casa de bolsa para cuentas que aparecen en Inversiones.",
     "errors": {
       "post": "Error al registrar",
       "createAccount": "Error al crear cuenta"
@@ -160,10 +173,29 @@
     }
   },
   "investments": {
-    "intro": "Posiciones modeladas como cuentas de activo en el libro. Rendimiento, lotes e IRR no están en esta versión; usa el harness MCP para operaciones avanzadas.",
-    "emptyTitle": "Sin posiciones",
-    "emptyBody": "No hay cuentas de activo con saldo. Crea una cuenta ASSET en Movimientos.",
-    "positionsCaption": "Posiciones de inversión por cuenta"
+    "heroTitle": "Portafolio",
+    "intro": "Las posiciones son cuentas de activo en el libro. Rendimiento avanzado, lotes e IRR están en el harness MCP.",
+    "footnote": "No se calculan rendimiento ni lotes fiscales aquí — los saldos reflejan solo movimientos contabilizados.",
+    "segmentLabel": "Filtro del portafolio",
+    "segmentHoldings": "Inversiones",
+    "segmentCash": "Efectivo",
+    "segmentAll": "Todos los activos",
+    "segmentEmptyTitle": "Nada en este filtro",
+    "segmentEmptyBody": "Aún no hay {{segment}} con saldo. Prueba otro filtro o registra un movimiento.",
+    "emptyTitle": "Sin saldos de activo",
+    "emptyBody": "Crea una cuenta de banco o casa de bolsa y registra un depósito para ver tu portafolio aquí.",
+    "createHoldingCta": "Añadir cuenta en Movimientos",
+    "kpiGroup": "Resumen del portafolio",
+    "totalValue": "Valor total",
+    "positionCount": "{{count}} posiciones",
+    "largestHolding": "Mayor posición",
+    "topAllocation": "Mayor peso",
+    "allocationTitle": "Distribución",
+    "positionsTitle": "Posiciones",
+    "positionsCaption": "Posiciones de inversión por cuenta",
+    "subtypeColumn": "Tipo",
+    "shareColumn": "Peso",
+    "ofPortfolio": "del total filtrado"
   },
   "reconciliation": {
     "intro": "Filtra por periodo del estado de cuenta y marca partidas conciliadas.",

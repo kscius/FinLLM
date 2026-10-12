@@ -27,6 +27,7 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
   const [newCode, setNewCode] = useState("");
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState<"ASSET" | "EXPENSE" | "INCOME">("ASSET");
+  const [assetSubtype, setAssetSubtype] = useState<"CASH" | "BANK">("BANK");
 
   const assets = accounts.filter((a) => a.type === "ASSET" && !a.isSystem);
   const expenses = accounts.filter((a) => a.type === "EXPENSE" && !a.isSystem);
@@ -81,7 +82,12 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
           code: newCode,
           name: newName,
           type: newType,
-          subtype: newType === "ASSET" ? "CASH" : newType === "EXPENSE" ? "EXPENSE_GENERIC" : "INCOME_GENERIC",
+          subtype:
+            newType === "ASSET"
+              ? assetSubtype
+              : newType === "EXPENSE"
+                ? "EXPENSE_GENERIC"
+                : "INCOME_GENERIC",
           currencyCode: "MXN",
         }),
       });
@@ -207,6 +213,20 @@ export function MovementsView({ accounts, onPosted, onAccountsChanged }: Props) 
               <option value="INCOME">{accountTypeLabel("INCOME")}</option>
             </select>
           </div>
+          {newType === "ASSET" && (
+            <div className="field">
+              <label htmlFor="acc-subtype">{t("movements.assetSubtype")}</label>
+              <select
+                id="acc-subtype"
+                value={assetSubtype}
+                onChange={(e) => setAssetSubtype(e.target.value as typeof assetSubtype)}
+              >
+                <option value="BANK">{t("accountSubtypes.BANK")}</option>
+                <option value="CASH">{t("accountSubtypes.CASH")}</option>
+              </select>
+              <p className="field-hint">{t("movements.assetSubtypeHint")}</p>
+            </div>
+          )}
           <button type="submit" className="btn btn-ghost btn-sm">{t("movements.createAccount")}</button>
         </form>
       </details>

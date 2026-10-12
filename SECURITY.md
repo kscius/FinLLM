@@ -14,6 +14,10 @@ Report vulnerabilities privately via GitHub Security Advisories or email to the 
 - After bootstrap, set `SETUP_BOOTSTRAP_SECRET` and keep `ALLOW_PUBLIC_SETUP_STATUS=false` in production.
 - MCP `ledger.write` tokens require `X-Mcp-Write-Confirm: 1` and expire by default (`MCP_TOKEN_DEFAULT_TTL_DAYS`).
 
+## Deployment
+
+Production checklist (secrets, Traefik, bootstrap): [docs/deployment.md](docs/deployment.md). Use strong passwords in `deploy/traefik-example/.env`, not defaults from dev Compose.
+
 ## Supported versions
 
 | Version | Supported |
