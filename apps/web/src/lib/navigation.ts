@@ -2,6 +2,7 @@ import type { AppView } from "./types.js";
 
 export const VIEW_META: Record<AppView, { slug: string; titleKey: string }> = {
   overview: { slug: "overview", titleKey: "nav.overview" },
+  activity: { slug: "activity", titleKey: "nav.activity" },
   movements: { slug: "movements", titleKey: "nav.movements" },
   import: { slug: "import", titleKey: "nav.import" },
   budgets: { slug: "budgets", titleKey: "nav.budgets" },
@@ -12,6 +13,8 @@ export const VIEW_META: Record<AppView, { slug: string; titleKey: string }> = {
 /** Legacy Spanish hash slugs (backward compatible). */
 const LEGACY_SLUG_TO_VIEW: Record<string, AppView> = {
   resumen: "overview",
+  actividad: "activity",
+  gastos: "activity",
   movimientos: "movements",
   importar: "import",
   presupuestos: "budgets",

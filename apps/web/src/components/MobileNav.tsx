@@ -3,7 +3,7 @@ import { NavIcon } from "./NavIcon.js";
 import { VIEW_META } from "../lib/navigation.js";
 import type { AppView } from "../lib/types.js";
 
-const MOBILE_VIEWS: AppView[] = ["overview", "movements", "investments", "budgets", "import"];
+const MOBILE_VIEWS: AppView[] = ["overview", "activity", "movements", "investments", "budgets"];
 
 type Props = {
   view: AppView;

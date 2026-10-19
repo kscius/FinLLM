@@ -14,5 +14,8 @@ coverage/
 postgres-data/
 .cursor/plans/
 
+# Personal import CSVs (bank statements) — keep local only
+/data/*.csv
+
 # Local server only (Traefik / Cloudflare host) — never commit
 /deploy/

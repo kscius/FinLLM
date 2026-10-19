@@ -102,7 +102,15 @@ export async function createAndPostTransaction(db: Db, input: CreateTransactionI
     });
   }
 
-  const after = { transactionId: txn.id, kind: classified.kind, splits: input.splits };
+  const after = {
+    transactionId: txn.id,
+    kind: classified.kind,
+    splits: input.splits.map((s) => ({
+      accountId: s.accountId,
+      debitMinor: s.debitMinor.toString(),
+      creditMinor: s.creditMinor.toString(),
+    })),
+  };
   await db.insert(auditEvents).values({
     actor: input.actor,
     action: "POST",

@@ -22,7 +22,14 @@ export type AccountRow = {
   isSystem?: boolean;
 };
 
-export type AppView = "overview" | "movements" | "import" | "budgets" | "investments" | "reconciliation";
+export type AppView =
+  | "overview"
+  | "activity"
+  | "movements"
+  | "import"
+  | "budgets"
+  | "investments"
+  | "reconciliation";
 
 export type BalanceRow = {
   accountId: string;

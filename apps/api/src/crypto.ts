@@ -9,5 +9,9 @@ export function generateToken(): string {
 }
 
 export function sha256Payload(payload: unknown): string {
-  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+  return createHash("sha256")
+    .update(
+      JSON.stringify(payload, (_, value) => (typeof value === "bigint" ? value.toString() : value)),
+    )
+    .digest("hex");
 }

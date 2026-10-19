@@ -8,6 +8,7 @@
     "mobile": "Navegación rápida",
     "primary": "Navegación principal",
     "overview": "Resumen",
+    "activity": "Actividad",
     "movements": "Movimientos",
     "import": "Importar",
     "budgets": "Presupuestos",
@@ -80,7 +81,11 @@
     "emptyTitle": "Sin movimientos aún",
     "emptyBody": "Registra un gasto o ingreso en Movimientos, o importa un CSV para ver saldos aquí.",
     "chartNetWorth": "Tendencia de patrimonio",
-    "chartExpenses": "Gastos por categoría (últimos 30 días)",
+    "chartExpenses": "Gastos por categoría",
+    "chartFrom": "Desde",
+    "chartTo": "Hasta",
+    "chartDrillHint": "Haz clic en una barra para ver los movimientos de esa categoría en Actividad.",
+    "exploreActivity": "Explorar gastos",
     "chartEmpty": "Aún no hay datos suficientes para gráficos.",
     "chartLoading": "Cargando gráficos…",
     "chartError": "No se pudieron cargar los análisis.",
@@ -116,6 +121,41 @@
     "errors": {
       "post": "Error al registrar",
       "createAccount": "Error al crear cuenta"
+    }
+  },
+  "activity": {
+    "intro": "Consulta movimientos publicados, filtra por periodo y revisa las partidas (doble partida) de cada transacción.",
+    "fromDate": "Desde",
+    "toDate": "Hasta",
+    "presetAugust": "Agosto (año actual)",
+    "smallExpensesToggle": "Solo gastos hormiga",
+    "smallExpensesHint": "Muestra movimientos con monto menor o igual al tope (MXN).",
+    "maxAmountMxn": "Tope por movimiento (MXN)",
+    "kindGroup": "Tipo de movimiento",
+    "kind": {
+      "all": "Todos",
+      "expense": "Gastos",
+      "income": "Ingresos"
+    },
+    "categoryFilter": "Categoría",
+    "allCategories": "Todas las categorías",
+    "load": "Cargar movimientos",
+    "summary": "{{count}} movimientos · total {{total}}",
+    "category": "Categoría",
+    "emptyTitle": "Sin datos en este periodo",
+    "emptyBody": "Ajusta las fechas o importa/registra movimientos, luego pulsa Cargar.",
+    "emptyFilteredTitle": "Ningún movimiento coincide",
+    "emptyFilteredBody": "Prueba otro rango, categoría o desactiva el filtro de gastos hormiga.",
+    "tableCaption": "Libro de movimientos",
+    "detailTitle": "Detalle de la transacción",
+    "detailMeta": "Tipo {{kind}} · estado {{status}}",
+    "splitsCaption": "Partidas contables",
+    "debit": "Debe",
+    "credit": "Haber",
+    "reconcile": "Conciliación",
+    "limitHint": "Se muestran hasta 200 partidas; acota fechas o categoría si falta historial.",
+    "errors": {
+      "load": "No se pudieron cargar los movimientos"
     }
   },
   "import": {

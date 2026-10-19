@@ -510,6 +510,27 @@ summary:focus-visible {
   border-bottom: none;
 }
 
+.activity-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 960px) {
+  .activity-layout {
+    grid-template-columns: 1fr minmax(280px, 36%);
+    align-items: start;
+  }
+}
+
+.activity-detail {
+  position: sticky;
+  top: 1rem;
+}
+
+.data-table tr.row-selected td {
+  background: var(--accent-soft);
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;

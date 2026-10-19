@@ -15,6 +15,7 @@ import type { AccountRow, AppView, BalanceRow } from "./lib/types.js";
 import { BudgetsView } from "./views/BudgetsView.js";
 import { ImportCsvView } from "./views/ImportCsvView.js";
 import { InvestmentsView } from "./views/InvestmentsView.js";
+import { ActivityView, type ActivityInitialFilters } from "./views/ActivityView.js";
 import { MovementsView } from "./views/MovementsView.js";
 
 type Me = {
@@ -58,6 +59,7 @@ export function App() {
   const [pageStatus, setPageStatus] = useState("");
   const [reconcileFeedback, setReconcileFeedback] = useState<{ text: string; kind: "success" | "error" } | null>(null);
   const [reconcileRowBusy, setReconcileRowBusy] = useState<string | null>(null);
+  const [activityInitialFilters, setActivityInitialFilters] = useState<ActivityInitialFilters | null>(null);
   const viewTitleRef = useRef<HTMLHeadingElement>(null);
 
   const navigateToView = useCallback((next: AppView) => {
@@ -65,6 +67,14 @@ export function App() {
     setLocationHashForView(next);
     setPageStatus(t("status.view", { title: t(VIEW_META[next].titleKey) }));
   }, [t]);
+
+  const openActivity = useCallback(
+    (filters?: ActivityInitialFilters) => {
+      if (filters) setActivityInitialFilters(filters);
+      navigateToView("activity");
+    },
+    [navigateToView],
+  );
 
   const refreshMe = useCallback(async () => {
     try {
@@ -228,6 +238,7 @@ export function App() {
     if (!me?.user) return;
     if (
       (view === "reconciliation" && accounts.length === 0) ||
+      view === "activity" ||
       view === "movements" ||
       view === "import" ||
       view === "budgets"
@@ -371,8 +382,15 @@ export function App() {
                 <BalanceBreakdown rows={balances.balances} />
               )}
             </section>
-            <OverviewCharts />
+            <OverviewCharts
+              onExploreCategory={({ accountId, fromDate, toDate }) =>
+                openActivity({ accountId, fromDate, toDate })
+              }
+            />
             <div className="quick-actions" role="navigation" aria-label={t("overview.quickActions")}>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => openActivity()}>
+                {t("overview.exploreActivity")}
+              </button>
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("movements")}>
                 {t("overview.recordMovement")}
               </button>
@@ -424,6 +442,14 @@ export function App() {
               )}
             </section>
           </>
+        )}
+
+        {view === "activity" && (
+          <ActivityView
+            accounts={allAccounts}
+            initialFilters={activityInitialFilters}
+            onConsumedInitialFilters={() => setActivityInitialFilters(null)}
+          />
         )}
 
         {view === "movements" && (

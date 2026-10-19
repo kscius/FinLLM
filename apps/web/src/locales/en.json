@@ -8,6 +8,7 @@
     "mobile": "Quick navigation",
     "primary": "Main navigation",
     "overview": "Overview",
+    "activity": "Activity",
     "movements": "Transactions",
     "import": "Import",
     "budgets": "Budgets",
@@ -80,7 +81,11 @@
     "emptyTitle": "No transactions yet",
     "emptyBody": "Record an expense or income under Transactions, or import a CSV to see balances here.",
     "chartNetWorth": "Net worth trend",
-    "chartExpenses": "Spending by category (last 30 days)",
+    "chartExpenses": "Spending by category",
+    "chartFrom": "From",
+    "chartTo": "To",
+    "chartDrillHint": "Click a bar to open those transactions in Activity.",
+    "exploreActivity": "Explore spending",
     "chartEmpty": "Not enough data for charts yet.",
     "chartLoading": "Loading charts…",
     "chartError": "Could not load analytics.",
@@ -116,6 +121,41 @@
     "errors": {
       "post": "Could not post transaction",
       "createAccount": "Could not create account"
+    }
+  },
+  "activity": {
+    "intro": "Browse posted transactions, filter by period, and inspect double-entry splits for each one.",
+    "fromDate": "From",
+    "toDate": "To",
+    "presetAugust": "August (current year)",
+    "smallExpensesToggle": "Small expenses only",
+    "smallExpensesHint": "Shows transactions at or below the cap (MXN).",
+    "maxAmountMxn": "Cap per transaction (MXN)",
+    "kindGroup": "Transaction kind",
+    "kind": {
+      "all": "All",
+      "expense": "Expenses",
+      "income": "Income"
+    },
+    "categoryFilter": "Category",
+    "allCategories": "All categories",
+    "load": "Load transactions",
+    "summary": "{{count}} transactions · total {{total}}",
+    "category": "Category",
+    "emptyTitle": "No data in this period",
+    "emptyBody": "Adjust dates or post/import transactions, then load.",
+    "emptyFilteredTitle": "No matching transactions",
+    "emptyFilteredBody": "Try another range, category, or turn off the small-expense filter.",
+    "tableCaption": "Transaction ledger",
+    "detailTitle": "Transaction detail",
+    "detailMeta": "Kind {{kind}} · status {{status}}",
+    "splitsCaption": "Ledger splits",
+    "debit": "Debit",
+    "credit": "Credit",
+    "reconcile": "Reconcile",
+    "limitHint": "Showing up to 200 split rows; narrow dates or category if history is truncated.",
+    "errors": {
+      "load": "Could not load transactions"
     }
   },
   "import": {

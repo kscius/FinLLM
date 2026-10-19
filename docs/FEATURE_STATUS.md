@@ -15,6 +15,7 @@ Living matrix for **0.1.0 MVP**. Product mission and doc map: [README](../README
 | Web analytics API | Implemented | `GET /api/v1/analytics/net-worth-series`, `expenses-by-category` |
 | Investments | Partial | Web portafolio (filtros BANK/cash, KPIs, donut, nav móvil); analytics/lotes Phase 4+ |
 | Web — movements / CSV | Implemented | Gasto/ingreso, import preview+commit, crear cuentas |
+| Web — activity / spending explorer | Implemented | Vista Actividad: libro, detalle por partidas, filtro periodo (preset agosto), gastos hormiga, drill-down desde gráfico de gastos |
 | MCP read tools | Implemented | list_accounts, get_balances, list_transactions |
 | MCP mutations | Implemented | preview_post_transaction + commit_post_transaction (confirm flow) |
 | Security hardening | Implemented | CSP (nginx), Drizzle CVE patch, confirm-only txn writes, MCP token TTL/revoke, setup bootstrap |

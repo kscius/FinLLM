@@ -8,6 +8,12 @@ const paths: Record<AppView, ReactNode> = {
       fill="currentColor"
     />
   ),
+  activity: (
+    <>
+      <path d="M6 4h12v3H6V4zm0 6h8v2H6v-2zm0 5h10v2H6v-2z" fill="currentColor" />
+      <circle cx="18" cy="17" r="2.5" fill="currentColor" />
+    </>
+  ),
   movements: (
     <path
       d="M4 6h16v2H4V6zm0 5h10v2H4v-2zm0 5h14v2H4v-2z"
