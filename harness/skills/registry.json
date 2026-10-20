@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-11",
+  "updated": "2026-10-19",
   "policy": "Canonical skills live under harness/skills/. Run scripts/sync-harness-skills.sh to mirror into .cursor/skills/. Add or bump maturity when product or MCP surface changes; see harness/EVOLUTION.md.",
   "maturity": {
     "active": "MCP/API support exists; skill is maintained with product",
@@ -88,6 +88,46 @@
       "mcp_tools": ["list_transactions", "get_balances"]
     },
     {
+      "id": "finllm-spending-insights",
+      "domain": "cashflow",
+      "maturity": "seed",
+      "triggers": [
+        "analizar gastos",
+        "dónde se va el dinero",
+        "gastos hormiga",
+        "top categorías",
+        "patrones de gasto"
+      ],
+      "mcp_tools": ["list_accounts", "list_transactions", "get_balances"],
+      "product_note": "Category totals via REST analytics when available; MCP aggregates from splits"
+    },
+    {
+      "id": "finllm-financial-coach",
+      "domain": "coaching",
+      "maturity": "seed",
+      "triggers": [
+        "mejorar finanzas",
+        "reducir gastos",
+        "consejos",
+        "coach",
+        "revisión mensual",
+        "cómo ahorrar"
+      ],
+      "mcp_tools": ["get_balances", "list_transactions", "list_accounts"]
+    },
+    {
+      "id": "finllm-savings-goals",
+      "domain": "savings",
+      "maturity": "seed",
+      "triggers": [
+        "meta de ahorro",
+        "fondo de emergencia",
+        "ahorrar más",
+        "objetivo de compra"
+      ],
+      "mcp_tools": ["get_balances", "list_accounts", "list_transactions"]
+    },
+    {
       "id": "finllm-investments",
       "domain": "investments",
       "maturity": "planned",
@@ -111,7 +151,17 @@
     {
       "id": "finllm-budget-specialist",
       "file": "harness/agents/finllm-budget-specialist.md",
-      "skills": ["finllm-budgets", "finllm-cashflow-spending"]
+      "skills": ["finllm-budgets", "finllm-cashflow-spending", "finllm-spending-insights"]
+    },
+    {
+      "id": "finllm-financial-coach",
+      "file": "harness/agents/finllm-financial-coach.md",
+      "skills": [
+        "finllm-financial-coach",
+        "finllm-spending-insights",
+        "finllm-savings-goals",
+        "finllm-budgets"
+      ]
     },
     {
       "id": "finllm-reconciliation-specialist",

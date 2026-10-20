@@ -47,7 +47,7 @@ Catálogo vivo: [`skills/registry.json`](skills/registry.json) · índice: [`ski
 | ---- | ------ |
 | Meta | `finllm-skill-router` |
 | Base | `finllm-chat-assistant`, `finllm-ledger-mutations` |
-| Dominio | patrimonio, cuentas, transferencias, FX, presupuestos, conciliación, CSV, cashflow, inversiones (planned), impuestos (límite) |
+| Dominio | patrimonio, cuentas, transferencias, FX, presupuestos, conciliación, CSV, cashflow, análisis/coach/ahorro, inversiones (planned), impuestos (límite) |
 
 **Cursor:** `./scripts/sync-harness-skills.sh` copia `harness/skills/` → [`.cursor/skills/`](../.cursor/skills/).
 

@@ -21,3 +21,9 @@ description: >-
 
 - Aggregate only from tool results; state date range and accounts used.
 - If user wants categories not in chart of accounts, suggest account structure changes via product, not ad-hoc relabeling in chat.
+
+## Related skills
+
+- **Patrones y tablas por periodo:** `finllm-spending-insights`
+- **Preguntas de mejora y sesiones guiadas:** `finllm-financial-coach`
+- **Metas y fondo de emergencia:** `finllm-savings-goals`

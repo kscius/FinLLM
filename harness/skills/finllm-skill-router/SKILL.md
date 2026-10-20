@@ -32,6 +32,9 @@ Read [`registry.json`](registry.json) in this directory for the full catalog (`i
 | Conciliación | `finllm-reconciliation` |
 | CSV / import | `finllm-csv-import` |
 | Gastos / flujo | `finllm-cashflow-spending` |
+| Análisis de gastos / patrones | `finllm-spending-insights` |
+| Coach / mejorar hábitos / consejos | `finllm-financial-coach` |
+| Metas de ahorro / emergencia | `finllm-savings-goals` |
 | Inversiones | `finllm-investments` |
 | Impuestos | `finllm-taxes-advisory` |
 

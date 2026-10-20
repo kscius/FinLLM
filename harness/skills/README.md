@@ -24,6 +24,9 @@ Catálogo maestro: [`registry.json`](registry.json) (maturity, triggers, MCP too
 | `finllm-reconciliation` | active |
 | `finllm-csv-import` | seed |
 | `finllm-cashflow-spending` | seed |
+| `finllm-spending-insights` | seed |
+| `finllm-financial-coach` | seed |
+| `finllm-savings-goals` | seed |
 | `finllm-investments` | planned |
 | `finllm-taxes-advisory` | planned |
 
