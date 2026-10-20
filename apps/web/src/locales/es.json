@@ -62,7 +62,8 @@
     "initialize": "Inicializar instancia",
     "signIn": "Iniciar sesión",
     "haveAccount": "Ya tengo cuenta",
-    "alreadyInitialized": "Esta instancia ya está configurada. Inicia sesión con tu correo y contraseña."
+    "alreadyInitialized": "Esta instancia ya está configurada. Inicia sesión con tu correo y contraseña.",
+    "visualPitch": "Patrimonio, movimientos y presupuestos en un solo lugar — con doble partida y asistentes IA vía MCP."
   },
   "theme": {
     "label": "Tema",
@@ -86,6 +87,7 @@
     "chartTo": "Hasta",
     "chartDrillHint": "Haz clic en una barra para ver los movimientos de esa categoría en Actividad.",
     "exploreActivity": "Explorar gastos",
+    "accountsHint": "Cuentas con saldo en el libro",
     "chartEmpty": "Aún no hay datos suficientes para gráficos.",
     "chartLoading": "Cargando gráficos…",
     "chartError": "No se pudieron cargar los análisis.",

@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BalanceBreakdown } from "./components/BalanceBreakdown.js";
 import { BrandLockup } from "./components/BrandLockup.js";
 import { EmptyState } from "./components/EmptyState.js";
 import { LanguageToggle } from "./components/LanguageToggle.js";
 import { NavIcon } from "./components/NavIcon.js";
-import { OverviewCharts } from "./components/OverviewCharts.js";
 import { MobileNav } from "./components/MobileNav.js";
 import { ThemeToggle } from "./components/ThemeToggle.js";
 import { api } from "./lib/api.js";
-import { accountTypeLabel, formatMinorDisplay } from "./lib/format.js";
+import { formatMinorDisplay } from "./lib/format.js";
 import { setLocationHashForView, VIEW_META, viewFromLocationHash } from "./lib/navigation.js";
 import type { AccountRow, AppView, BalanceRow } from "./lib/types.js";
 import { BudgetsView } from "./views/BudgetsView.js";
@@ -17,6 +15,7 @@ import { ImportCsvView } from "./views/ImportCsvView.js";
 import { InvestmentsView } from "./views/InvestmentsView.js";
 import { ActivityView, type ActivityInitialFilters } from "./views/ActivityView.js";
 import { MovementsView } from "./views/MovementsView.js";
+import { OverviewDashboard } from "./views/OverviewDashboard.js";
 
 type Me = {
   user?: { email: string };
@@ -263,6 +262,7 @@ export function App() {
     return (
       <div className="auth-wrap">
         <a className="skip-link" href="#auth-main">{t("common.skipToContent")}</a>
+        <div className="auth-split">
         <main id="auth-main" className="card auth-card">
           <LanguageToggle />
           <BrandLockup as="h1" subtitle />
@@ -325,14 +325,16 @@ export function App() {
             )}
           </form>
         </main>
+          <aside className="auth-visual" aria-hidden="true">
+            <div className="auth-visual-content">
+              <p className="auth-visual-kicker">{t("app.tagline")}</p>
+              <p className="auth-visual-quote">{t("auth.visualPitch")}</p>
+            </div>
+          </aside>
+        </div>
       </div>
     );
   }
-
-  const netWorthDisplay =
-    balances?.netWorthMinor != null
-      ? formatMinorDisplay(balances.netWorthMinor, "MXN")
-      : balances?.netWorth ?? "—";
 
   return (
     <div className="app-shell">
@@ -369,79 +371,14 @@ export function App() {
           {viewTitle}
         </h2>
         {view === "overview" && (
-          <>
-            <section className="card hero-patrimonio" aria-labelledby="patrimonio-heading">
-              <h2 className="label" id="patrimonio-heading">{t("overview.netWorth")}</h2>
-              <p className="amount" aria-live="polite">
-                {balancesLoading ? t("common.loading") : netWorthDisplay}
-              </p>
-              {balancesError && (
-                <p className="alert" role="alert">{balancesError}</p>
-              )}
-              {balances && balances.balances.length > 0 && (
-                <BalanceBreakdown rows={balances.balances} />
-              )}
-            </section>
-            <OverviewCharts
-              onExploreCategory={({ accountId, fromDate, toDate }) =>
-                openActivity({ accountId, fromDate, toDate })
-              }
-            />
-            <div className="quick-actions" role="navigation" aria-label={t("overview.quickActions")}>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => openActivity()}>
-                {t("overview.exploreActivity")}
-              </button>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("movements")}>
-                {t("overview.recordMovement")}
-              </button>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("import")}>
-                {t("overview.importCsv")}
-              </button>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => navigateToView("reconciliation")}>
-                {t("overview.reconcile")}
-              </button>
-            </div>
-            <section className="card" aria-labelledby="cuentas-heading">
-              <div className="toolbar">
-                <h2 id="cuentas-heading" style={{ margin: 0, flex: 1 }}>{t("overview.accounts")}</h2>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => loadBalances()} disabled={balancesLoading}>
-                  {t("common.update")}
-                </button>
-              </div>
-              {!balancesLoading && balances && balances.balances.length === 0 && (
-                <EmptyState title={t("overview.emptyTitle")} illustration="ledger">
-                  {t("overview.emptyBody")}
-                </EmptyState>
-              )}
-              {balances && balances.balances.length > 0 && (
-                <div className="table-wrap">
-                  <table className="data-table">
-                    <caption className="sr-only">{t("overview.balancesCaption")}</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">{t("common.code")}</th>
-                        <th scope="col">{t("common.account")}</th>
-                        <th scope="col">{t("common.type")}</th>
-                        <th scope="col" className="amount-cell">{t("common.balance")}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {balances.balances.map((row) => (
-                        <tr key={row.accountId}>
-                          <td>{row.code}</td>
-                          <td>{row.name}</td>
-                          <td>{accountTypeLabel(row.type)}</td>
-                          <td className="amount-cell">
-                            {formatMinorDisplay(row.balanceMinor, row.currencyCode)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          </>
+          <OverviewDashboard
+            balances={balances}
+            balancesLoading={balancesLoading}
+            balancesError={balancesError}
+            onRefresh={() => loadBalances()}
+            onNavigate={navigateToView}
+            onOpenActivity={openActivity}
+          />
         )}
 
         {view === "activity" && (

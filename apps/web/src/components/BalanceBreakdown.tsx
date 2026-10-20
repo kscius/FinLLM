@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { sumAbsMinorByType } from "../lib/balance-summary.js";
 import { formatMinorDisplay } from "../lib/format.js";
 import type { BalanceRow } from "../lib/types.js";
 
@@ -6,24 +7,10 @@ type Props = {
   rows: BalanceRow[];
 };
 
-function sumAbsMinor(rows: BalanceRow[], type: string): bigint {
-  let n = 0n;
-  for (const r of rows) {
-    if (r.type !== type) continue;
-    try {
-      const v = BigInt(r.balanceMinor);
-      n += v < 0n ? -v : v;
-    } catch {
-      /* skip */
-    }
-  }
-  return n;
-}
-
 export function BalanceBreakdown({ rows }: Props) {
   const { t } = useTranslation();
-  const assets = sumAbsMinor(rows, "ASSET");
-  const liabilities = sumAbsMinor(rows, "LIABILITY");
+  const assets = sumAbsMinorByType(rows, "ASSET");
+  const liabilities = sumAbsMinorByType(rows, "LIABILITY");
   const total = assets + liabilities;
   if (total === 0n) return null;
 

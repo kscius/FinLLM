@@ -1,6 +1,11 @@
 :root {
-  --font-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-serif);
+  --surface-1: var(--paper-elevated);
+  --surface-2: color-mix(in srgb, var(--paper-elevated) 88%, var(--accent-soft));
+  --ring: color-mix(in srgb, var(--accent) 35%, transparent);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --paper: #f6f1e8;
   --paper-elevated: #fffdf8;
   --ink: #1c1917;
@@ -87,9 +92,11 @@ body {
   font-family: var(--font-sans);
   color: var(--ink);
   background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 55%),
+    radial-gradient(ellipse 100% 70% at 85% -15%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 10% 100%, color-mix(in srgb, var(--accent-soft) 45%, transparent), transparent 45%),
     var(--paper);
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
 .skip-link {
@@ -284,11 +291,11 @@ body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  width: min(1120px, 100%);
+  width: min(1160px, 100%);
   margin: 0 auto;
-  padding: 1.25rem 1.25rem 2.5rem;
+  padding: 1.25rem clamp(1rem, 3vw, 1.75rem) 2.5rem;
   padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem));
-  animation: view-enter 320ms ease both;
+  animation: view-enter 380ms var(--ease-out) both;
 }
 
 @keyframes view-enter {
@@ -310,12 +317,12 @@ body {
 }
 
 .card {
-  background: var(--paper-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--surface-1);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  border-radius: calc(var(--radius) + 2px);
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--ink) 3%, transparent) inset;
 }
 
 .card h2 {
@@ -327,6 +334,153 @@ body {
 .hero-patrimonio {
   text-align: center;
   padding: 1.75rem 1.5rem;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-stagger > * {
+  animation: dashboard-rise 520ms var(--ease-out) both;
+}
+
+.dashboard-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.dashboard-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.dashboard-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.dashboard-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.dashboard-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.dashboard-stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+@keyframes dashboard-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-soft) 40%, var(--paper-elevated)), var(--paper-elevated));
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+}
+
+.dashboard-hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 70%;
+  background: radial-gradient(circle, var(--ring), transparent 65%);
+  pointer-events: none;
+}
+
+.dashboard-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-hero-skeleton {
+  max-width: 14rem;
+  margin: 0.5rem auto 0;
+}
+
+.dashboard-kpis {
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-actions {
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-section-title {
+  margin: 0;
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.mono-chip {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  color: var(--ink);
+}
+
+.data-table--comfortable tbody tr {
+  transition: background var(--transition);
+}
+
+.data-table--comfortable tbody tr:hover {
+  background: color-mix(in srgb, var(--accent-soft) 35%, transparent);
+}
+
+.auth-split {
+  display: grid;
+  width: min(920px, 100%);
+  gap: 0;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .auth-split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    box-shadow: 0 24px 48px color-mix(in srgb, var(--ink) 12%, transparent);
+    border-radius: calc(var(--radius) + 4px);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .auth-split .auth-card {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+  }
+}
+
+.auth-visual {
+  display: none;
+  padding: 2rem 1.75rem;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 88%, #0a3d34), color-mix(in srgb, var(--accent-hover) 70%, #1c1917));
+  color: #f8faf9;
+}
+
+@media (min-width: 768px) {
+  .auth-visual {
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
+.auth-visual-kicker {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.auth-visual-quote {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+  line-height: 1.35;
+  font-weight: 500;
 }
 
 .hero-patrimonio .label {
@@ -808,11 +962,20 @@ summary:focus-visible {
 }
 
 .stat-card {
-  background: var(--paper-elevated);
-  border: 1px solid var(--border);
+  background: var(--surface-1);
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
   box-shadow: var(--shadow);
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+@media (hover: hover) {
+  .stat-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 8%, transparent);
+  }
 }
 
 .stat-card-label {

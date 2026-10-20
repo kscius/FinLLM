@@ -62,7 +62,8 @@
     "initialize": "Initialize instance",
     "signIn": "Sign in",
     "haveAccount": "I already have an account",
-    "alreadyInitialized": "This instance is already set up. Sign in with your email and password."
+    "alreadyInitialized": "This instance is already set up. Sign in with your email and password.",
+    "visualPitch": "Net worth, transactions, and budgets in one place — double-entry ledger with AI assistants via MCP."
   },
   "theme": {
     "label": "Theme",
@@ -86,6 +87,7 @@
     "chartTo": "To",
     "chartDrillHint": "Click a bar to open those transactions in Activity.",
     "exploreActivity": "Explore spending",
+    "accountsHint": "Accounts with a balance in the ledger",
     "chartEmpty": "Not enough data for charts yet.",
     "chartLoading": "Loading charts…",
     "chartError": "Could not load analytics.",
